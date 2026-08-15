@@ -2,951 +2,520 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#111827">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>SZN2WeightLoss - 90 Day Tracker</title>
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0">
-
-  <meta
-    name="theme-color"
-    content="#111827">
-
-  <meta
-    name="apple-mobile-web-app-capable"
-    content="yes">
-
-  <meta
-    name="apple-mobile-web-app-status-bar-style"
-    content="black-translucent">
-
-  <meta
-    name="apple-mobile-web-app-title"
-    content="SZN2WeightLoss">
-
-  <title>SZN2WeightLoss — 90 Day Tracker</title>
-
-  <link
-    rel="stylesheet"
-    href="style.css">
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-  <!-- =========================
-       HEADER
-  ========================== -->
+<header class="topbar">
+  <div>
+    <h1>SZN2WeightLoss</h1>
+    <p id="headerDay">Day 1 of 90</p>
+  </div>
 
-  <header class="topbar">
+  <button id="todayButton" class="small-button">
+    Today
+  </button>
+</header>
 
-    <div>
-      <h1>SZN2WeightLoss</h1>
 
-      <p id="dayLabel">
-        Day 1 of 90
-      </p>
+<nav class="navigation">
+
+  <button class="nav-button active" data-page="dayPage">
+    Today
+  </button>
+
+  <button class="nav-button" data-page="calendarPage">
+    90 Days
+  </button>
+
+  <button class="nav-button" data-page="dashboardPage">
+    Dashboard
+  </button>
+
+</nav>
+
+
+<main>
+
+<!-- =========================
+     DAY PAGE
+========================= -->
+
+<section id="dayPage" class="page active">
+
+  <div class="day-card">
+
+    <button id="previousDay" class="arrow-button">
+      ‹
+    </button>
+
+    <div class="day-center">
+
+      <div id="dateDisplay">
+        August 16, 2026
+      </div>
+
+      <div class="target-title">
+        Calorie Target
+      </div>
+
+      <div class="target-number">
+        <span id="targetDisplay">900</span>
+        <small>cal</small>
+      </div>
+
+      <div id="specialBadge" class="special-badge hidden">
+        Special Occasion · 1,800 cal
+      </div>
+
     </div>
 
-    <button
-      id="todayBtn"
-      class="header-btn">
-      Today
+    <button id="nextDay" class="arrow-button">
+      ›
     </button>
 
-  </header>
+  </div>
 
 
-  <!-- =========================
-       MAIN NAVIGATION
-  ========================== -->
+  <div class="special-buttons">
 
-  <nav class="tabs">
-
-    <button
-      class="tab active"
-      data-view="todayView">
-      Today
+    <button id="specialButton" class="secondary-button">
+      Use Special Occasion
     </button>
 
-    <button
-      class="tab"
-      data-view="calendarView">
-      90 Days
+    <button id="removeSpecialButton" class="secondary-button hidden">
+      Remove Special Occasion
     </button>
 
-    <button
-      class="tab"
-      data-view="dashboardView">
-      Dashboard
-    </button>
-
-  </nav>
+  </div>
 
 
-  <main>
+  <!-- STATS -->
+
+  <div class="stats">
+
+    <div class="stat">
+      <span>Calories</span>
+      <strong id="caloriesTotal">0</strong>
+      <small>/ <span id="calorieGoal">900</span></small>
+    </div>
+
+    <div class="stat">
+      <span>Protein</span>
+      <strong id="proteinTotal">0</strong>
+      <small>g</small>
+    </div>
+
+    <div class="stat">
+      <span>Fiber</span>
+      <strong id="fiberTotal">0</strong>
+      <small>g</small>
+    </div>
+
+    <div class="stat">
+      <span>Water</span>
+      <strong id="waterTotal">0</strong>
+      <small>oz</small>
+    </div>
+
+  </div>
 
 
-    <!-- ==================================================
-         TODAY VIEW
-    =================================================== -->
+  <!-- PROGRESS -->
 
-    <section
-      id="todayView"
-      class="view active">
+  <div class="card">
 
+    <div class="progress-heading">
+      <strong>Daily Calories</strong>
+      <span id="calorieMessage">
+        900 remaining
+      </span>
+    </div>
 
-      <!-- DAY NAVIGATION -->
+    <div class="progress-track">
+      <div id="calorieProgress"></div>
+    </div>
 
-      <section class="date-card">
-
-        <button
-          id="prevDay"
-          class="day-nav"
-          aria-label="Previous day">
-          ‹
-        </button>
+  </div>
 
 
-        <div class="date-center">
+  <!-- FOOD -->
 
-          <div
-            id="dateLabel"
-            class="date-label">
-          </div>
+  <div class="card">
 
-          <div class="target-label">
-            Calorie target
-          </div>
+    <div class="section-heading">
 
-          <div class="calorie-target">
+      <h2>Food</h2>
 
-            <span id="targetCalories">
-              900
-            </span>
+      <button id="addFoodButton" class="primary-button">
+        + Add Food
+      </button>
 
-            <span>
-              cal
-            </span>
+    </div>
 
-          </div>
+    <div id="foodList">
 
-          <button
-            id="specialOccasionBtn"
-            class="special-btn">
-            Use special-occasion target
-          </button>
-
-        </div>
-
-
-        <button
-          id="nextDay"
-          class="day-nav"
-          aria-label="Next day">
-          ›
-        </button>
-
-      </section>
-
-
-      <!-- LOW-CALORIE NOTICE -->
-
-      <div
-        id="safetyNotice"
-        class="notice hidden">
-
-        This day's listed calorie target is very low.
-        The app is displaying your supplied schedule for
-        tracking purposes and is not a recommendation
-        to consume this amount.
-
+      <div class="empty">
+        No food logged yet.
       </div>
-
-
-      <!-- DAILY STATS -->
-
-      <section class="stats-grid">
-
-        <div class="stat-card">
-
-          <span>
-            Calories
-          </span>
-
-          <strong id="caloriesTotal">
-            0
-          </strong>
-
-          <small>
-            /
-            <span id="caloriesGoal">
-              900
-            </span>
-          </small>
-
-        </div>
-
-
-        <div class="stat-card">
-
-          <span>
-            Protein
-          </span>
-
-          <strong id="proteinTotal">
-            0
-          </strong>
-
-          <small>
-            g
-          </small>
-
-        </div>
-
-
-        <div class="stat-card">
-
-          <span>
-            Fiber
-          </span>
-
-          <strong id="fiberTotal">
-            0
-          </strong>
-
-          <small>
-            g
-          </small>
-
-        </div>
-
-
-        <div class="stat-card">
-
-          <span>
-            Water
-          </span>
-
-          <strong id="waterTotal">
-            0
-          </strong>
-
-          <small>
-            / 80 oz
-          </small>
-
-        </div>
-
-      </section>
-
-
-      <!-- CALORIE PROGRESS -->
-
-      <section class="card">
-
-        <div class="progress-header">
-
-          <span>
-            Daily calories
-          </span>
-
-          <span id="remainingCalories">
-            900 remaining
-          </span>
-
-        </div>
-
-        <div class="progress">
-
-          <div id="calorieProgress"></div>
-
-        </div>
-
-      </section>
-
-
-      <!-- FOOD -->
-
-      <section class="card">
-
-        <div class="section-title">
-
-          <div>
-
-            <h2>
-              Food
-            </h2>
-
-            <p class="section-subtitle">
-              Add food and your totals update automatically.
-            </p>
-
-          </div>
-
-          <button
-            id="addFoodBtn"
-            class="primary">
-            + Add Food
-          </button>
-
-        </div>
-
-
-        <div
-          id="foodList"
-          class="food-list">
-
-          <p class="empty">
-            No food logged yet.
-          </p>
-
-        </div>
-
-      </section>
-
-
-      <!-- DAILY TRACKING -->
-
-      <section class="card">
-
-        <h2>
-          Daily Tracking
-        </h2>
-
-
-        <div class="input-grid">
-
-
-          <label>
-
-            Water (oz)
-
-            <input
-              type="number"
-              id="waterInput"
-              min="0"
-              placeholder="80">
-
-          </label>
-
-
-          <label>
-
-            Steps
-
-            <input
-              type="number"
-              id="stepsInput"
-              min="0"
-              placeholder="10000">
-
-          </label>
-
-
-          <label>
-
-            Weight (lb)
-
-            <input
-              type="number"
-              id="weightInput"
-              min="0"
-              step="0.1"
-              placeholder="227">
-
-          </label>
-
-
-          <label>
-
-            Workout minutes
-
-            <input
-              type="number"
-              id="workoutInput"
-              min="0"
-              placeholder="30">
-
-          </label>
-
-
-        </div>
-
-
-        <label class="full-input">
-
-          Workout
-
-          <select id="workoutSelect">
-
-            <option value="">
-              None
-            </option>
-
-            <option value="Pilates">
-              Pilates
-            </option>
-
-            <option value="Barre">
-              Barre
-            </option>
-
-            <option value="Walking">
-              Walking
-            </option>
-
-            <option value="13-3-30">
-              13-3-30
-            </option>
-
-            <option value="Strength training">
-              Strength training
-            </option>
-
-            <option value="Other">
-              Other
-            </option>
-
-            <option value="Rest day">
-              Rest day
-            </option>
-
-          </select>
-
-        </label>
-
-
-        <label class="full-input">
-
-          Fasting window
-
-          <input
-            type="text"
-            id="fastingInput"
-            placeholder="Example: 8 PM – 10 AM">
-
-        </label>
-
-
-        <label class="full-input">
-
-          Notes
-
-          <textarea
-            id="notesInput"
-            placeholder="How did today go?"></textarea>
-
-        </label>
-
-
-        <label class="check-row">
-
-          <input
-            type="checkbox"
-            id="dayCompleteInput">
-
-          <span>
-            Mark today's check-in complete
-          </span>
-
-        </label>
-
-      </section>
-
-    </section>
-
-
-    <!-- ==================================================
-         90-DAY CALENDAR VIEW
-    =================================================== -->
-
-    <section
-      id="calendarView"
-      class="view">
-
-
-      <div class="page-heading">
-
-        <div>
-
-          <h2>
-            90-Day Calendar
-          </h2>
-
-          <p>
-            All 90 days at a glance.
-            Tap a day to open its entry.
-          </p>
-
-        </div>
-
-        <span
-          id="calendarRange"
-          class="date-range">
-        </span>
-
-      </div>
-
-
-      <!-- CALENDAR LEGEND -->
-
-      <div class="calendar-legend">
-
-        <span>
-          <i class="legend-dot target"></i>
-          Target
-        </span>
-
-        <span>
-          <i class="legend-dot logged"></i>
-          Logged
-        </span>
-
-        <span>
-          <i class="legend-dot over"></i>
-          Over target
-        </span>
-
-        <span>
-          <i class="legend-dot current"></i>
-          Current day
-        </span>
-
-      </div>
-
-
-      <!-- ALL 90 DAYS GO HERE -->
-
-      <div
-        id="calendarGrid"
-        class="calendar-grid">
-      </div>
-
-    </section>
-
-
-    <!-- ==================================================
-         DASHBOARD VIEW
-    =================================================== -->
-
-    <section
-      id="dashboardView"
-      class="view">
-
-
-      <div class="page-heading">
-
-        <div>
-
-          <h2>
-            Progress Dashboard
-          </h2>
-
-          <p>
-            Track your progress throughout the 90 days.
-          </p>
-
-        </div>
-
-      </div>
-
-
-      <!-- SUMMARY CARDS -->
-
-      <section class="summary-grid">
-
-
-        <div class="summary-card">
-
-          <span>
-            Days logged
-          </span>
-
-          <b id="dashDays">
-            0 / 90
-          </b>
-
-        </div>
-
-
-        <div class="summary-card">
-
-          <span>
-            Starting weight
-          </span>
-
-          <b id="dashStart">
-            —
-          </b>
-
-        </div>
-
-
-        <div class="summary-card">
-
-          <span>
-            Current weight
-          </span>
-
-          <b id="dashCurrent">
-            —
-          </b>
-
-        </div>
-
-
-        <div class="summary-card">
-
-          <span>
-            Weight change
-          </span>
-
-          <b id="dashChange">
-            —
-          </b>
-
-        </div>
-
-
-        <div class="summary-card">
-
-          <span>
-            Average calories
-          </span>
-
-          <b id="dashCalories">
-            —
-          </b>
-
-        </div>
-
-
-        <div class="summary-card">
-
-          <span>
-            Workouts
-          </span>
-
-          <b id="dashWorkouts">
-            0
-          </b>
-
-        </div>
-
-
-      </section>
-
-
-      <!-- WEIGHT GRAPH -->
-
-      <section class="card">
-
-        <div class="section-title">
-
-          <div>
-
-            <h2>
-              Weight Change
-            </h2>
-
-            <p class="section-subtitle">
-              Your weight entries will appear here automatically.
-            </p>
-
-          </div>
-
-          <span id="weightChartMeta"></span>
-
-        </div>
-
-
-        <div
-          id="weightChart"
-          class="weight-chart">
-
-          <p class="empty">
-            Enter your weight on any day to see your graph.
-          </p>
-
-        </div>
-
-      </section>
-
-
-      <!-- WEEKLY SUMMARY -->
-
-      <section class="card">
-
-        <h2>
-          Weekly Progress
-        </h2>
-
-        <div
-          id="weeklyTable"
-          class="weekly-table-container">
-        </div>
-
-      </section>
-
-
-      <!-- OVERALL PROGRESS -->
-
-      <section class="card">
-
-        <div class="section-title">
-
-          <h2>
-            90-Day Completion
-          </h2>
-
-          <span id="completedLabel">
-            0 / 90 days
-          </span>
-
-        </div>
-
-
-        <div class="progress">
-
-          <div id="overallProgress"></div>
-
-        </div>
-
-      </section>
-
-    </section>
-
-  </main>
-
-
-  <!-- ==================================================
-       ADD FOOD MODAL
-    ================================================== -->
-
-  <div
-    id="foodModal"
-    class="modal hidden">
-
-
-    <div class="modal-content">
-
-
-      <div class="modal-header">
-
-        <div>
-
-          <h2>
-            Add Food
-          </h2>
-
-          <p class="section-subtitle">
-            Search the database or add your own food.
-          </p>
-
-        </div>
-
-
-        <button
-          id="closeFoodModal"
-          class="close-btn"
-          aria-label="Close">
-          ×
-        </button>
-
-      </div>
-
-
-      <!-- FOOD TABS -->
-
-      <div class="modal-tabs">
-
-
-        <button
-          class="modal-tab active"
-          data-tab="searchTab">
-          Search Food
-        </button>
-
-
-        <button
-          class="modal-tab"
-          data-tab="customTab">
-          Custom Food
-        </button>
-
-
-        <button
-          class="modal-tab"
-          data-tab="myFoodsTab">
-          My Foods
-        </button>
-
-
-      </div>
-
-
-      <!-- SEARCH -->
-
-      <div
-        id="searchTab"
-        class="food-tab active">
-
-
-        <input
-          type="search"
-          id="foodSearch"
-          placeholder="Search chicken, yogurt, rice..."
-          autocomplete="off">
-
-
-        <div
-          id="foodResults"
-          class="food-results">
-        </div>
-
-
-      </div>
-
-
-      <!-- CUSTOM FOOD -->
-
-      <div
-        id="customTab"
-        class="food-tab">
-
-
-        <div class="custom-food-info">
-
-          <h3>
-            Add a food that isn't listed
-          </h3>
-
-          <p>
-            Enter the nutrition information from the
-            package or nutrition label.
-          </p>
-
-        </div>
-
-
-        <label>
-
-          Food name
-
-          <input
-            type="text"
-            id="customName"
-            placeholder="Example: CAVA chicken bowl">
-
-        </label>
-
-
-        <label>
-
-          Serving size
-
-          <input
-            type="text"
-            id="customServing"
-            placeholder="1 bowl">
-
-        </label>
-
-
-        <div class="custom-grid">
-
-
-          <label>
-
-            Calories
-
-            <input
-              type="number"
-              id="customCalories"
-              min="0"
-              placeholder="450">
-
-          </label>
-
-
-          <label>
-
-            Protein (g)
-
-            <input
-              type="number"
-              id="customProtein"
-              min="0"
-              step="0.1"
-              placeholder="35">
-
-          </label>
-
-
-          <label>
-
-            Fiber (g)
-
-            <input
-              type="number"
-              id="customFiber"
-              min="0"
-              step="0.1"
-              placeholder="8">
-
-          </label>
-
-
-        </div>
-
-
-        <label class="check-row">
-
-          <input
-            type="checkbox"
-            id="saveCustomFood"
-            checked>
-
-          <span>
-            Save this food to My Foods
-          </span>
-
-        </label>
-
-
-        <button
-          id="createCustomFood"
-          class="primary wide">
-          Add Custom Food
-        </button>
-
-
-      </div>
-
-
-      <!-- MY FOODS -->
-
-      <div
-        id="myFoodsTab"
-        class="food-tab">
-
-
-        <div
-          id="myFoodsResults"
-          class="food-results">
-        </div>
-
-
-      </div>
-
 
     </div>
 
   </div>
 
 
-  <!-- APP LOGIC -->
+  <!-- DAILY TRACKING -->
 
-  <script src="app.js"></script>
+  <div class="card">
+
+    <h2>Daily Tracking</h2>
+
+    <div class="two-columns">
+
+      <label>
+        Water (oz)
+        <input id="waterInput" type="number" min="0">
+      </label>
+
+      <label>
+        Steps
+        <input id="stepsInput" type="number" min="0">
+      </label>
+
+      <label>
+        Weight (lb)
+        <input id="weightInput" type="number" min="0" step="0.1">
+      </label>
+
+      <label>
+        Workout Minutes
+        <input id="workoutMinutesInput" type="number" min="0">
+      </label>
+
+    </div>
+
+
+    <label>
+      Workout
+      <select id="workoutInput">
+
+        <option value="">None</option>
+        <option value="Pilates">Pilates</option>
+        <option value="Barre">Barre</option>
+        <option value="Walking">Walking</option>
+        <option value="13-3-30">13-3-30</option>
+        <option value="Strength Training">Strength Training</option>
+        <option value="Other">Other</option>
+
+      </select>
+    </label>
+
+
+    <label>
+      Fasting Window
+      <input
+        id="fastingInput"
+        type="text"
+        placeholder="Example: 8 PM - 10 AM"
+      >
+    </label>
+
+
+    <label>
+      Notes
+      <textarea
+        id="notesInput"
+        placeholder="How did today go?"
+      ></textarea>
+    </label>
+
+  </div>
+
+</section>
+
+
+<!-- =========================
+     CALENDAR PAGE
+========================= -->
+
+<section id="calendarPage" class="page">
+
+  <div class="page-heading">
+
+    <div>
+      <h2>90-Day Calendar</h2>
+      <p>
+        Tap a day to open it.
+      </p>
+    </div>
+
+    <strong id="calendarCompleted">
+      0 / 90
+    </strong>
+
+  </div>
+
+  <div id="calendarGrid" class="calendar-grid"></div>
+
+</section>
+
+
+<!-- =========================
+     DASHBOARD PAGE
+========================= -->
+
+<section id="dashboardPage" class="page">
+
+  <h2>Dashboard</h2>
+
+  <div class="dashboard-stats">
+
+    <div class="dashboard-stat">
+      <span>Starting Weight</span>
+      <strong id="startingWeight">—</strong>
+    </div>
+
+    <div class="dashboard-stat">
+      <span>Latest Weight</span>
+      <strong id="latestWeight">—</strong>
+    </div>
+
+    <div class="dashboard-stat">
+      <span>Total Change</span>
+      <strong id="totalWeightChange">—</strong>
+    </div>
+
+    <div class="dashboard-stat">
+      <span>Workout Days</span>
+      <strong id="workoutDays">0</strong>
+    </div>
+
+  </div>
+
+
+  <div class="card">
+
+    <div class="section-heading">
+
+      <h2>Weight Change</h2>
+
+      <span id="weightChartLabel">
+        Add weight entries to see your graph.
+      </span>
+
+    </div>
+
+    <div id="weightChart" class="weight-chart"></div>
+
+  </div>
+
+
+  <div class="card">
+
+    <h2>90-Day Statistics</h2>
+
+    <div class="dashboard-stats">
+
+      <div class="dashboard-stat">
+        <span>Days Logged</span>
+        <strong id="daysLogged">0</strong>
+      </div>
+
+      <div class="dashboard-stat">
+        <span>Average Calories</span>
+        <strong id="averageCalories">—</strong>
+      </div>
+
+      <div class="dashboard-stat">
+        <span>Average Protein</span>
+        <strong id="averageProtein">—</strong>
+      </div>
+
+      <div class="dashboard-stat">
+        <span>Average Fiber</span>
+        <strong id="averageFiber">—</strong>
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <div class="card">
+
+    <h2>Weekly Progress</h2>
+
+    <div class="table-wrapper">
+
+      <table>
+
+        <thead>
+
+          <tr>
+            <th>Week</th>
+            <th>Start</th>
+            <th>End</th>
+            <th>Change</th>
+            <th>Workouts</th>
+          </tr>
+
+        </thead>
+
+        <tbody id="weeklyTable"></tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+</section>
+
+</main>
+
+
+<!-- =========================
+     FOOD MODAL
+========================= -->
+
+<div id="foodModal" class="modal hidden">
+
+  <div class="modal-box">
+
+    <div class="modal-heading">
+
+      <h2>Add Food</h2>
+
+      <button id="closeFoodButton" class="close-button">
+        ×
+      </button>
+
+    </div>
+
+
+    <input
+      id="foodSearch"
+      type="search"
+      placeholder="Search food..."
+      autocomplete="off"
+    >
+
+
+    <div id="foodResults"></div>
+
+
+    <button
+      id="createCustomFoodButton"
+      class="secondary-button full-width"
+    >
+      + Create Custom Food
+    </button>
+
+  </div>
+
+</div>
+
+
+<!-- =========================
+     CUSTOM FOOD MODAL
+========================= -->
+
+<div id="customFoodModal" class="modal hidden">
+
+  <div class="modal-box">
+
+    <div class="modal-heading">
+
+      <h2>Custom Food</h2>
+
+      <button id="closeCustomButton" class="close-button">
+        ×
+      </button>
+
+    </div>
+
+
+    <label>
+      Food Name
+      <input id="customName" type="text">
+    </label>
+
+
+    <label>
+      Serving
+      <input
+        id="customServing"
+        type="text"
+        placeholder="1 serving"
+      >
+    </label>
+
+
+    <div class="two-columns">
+
+      <label>
+        Calories
+        <input id="customCalories" type="number" min="0">
+      </label>
+
+      <label>
+        Protein (g)
+        <input
+          id="customProtein"
+          type="number"
+          min="0"
+          step="0.1"
+        >
+      </label>
+
+      <label>
+        Fiber (g)
+        <input
+          id="customFiber"
+          type="number"
+          min="0"
+          step="0.1"
+        >
+      </label>
+
+    </div>
+
+
+    <label class="checkbox-label">
+
+      <input
+        id="saveCustomFood"
+        type="checkbox"
+        checked
+      >
+
+      Save this food to My Foods
+
+    </label>
+
+
+    <p id="customError" class="error"></p>
+
+
+    <button
+      id="saveCustomButton"
+      class="primary-button full-width"
+    >
+      Add Food
+    </button>
+
+  </div>
+
+</div>
+
+
+<script src="app.js"></script>
 
 </body>
 </html>
