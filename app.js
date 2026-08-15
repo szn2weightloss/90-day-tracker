@@ -1,1020 +1,1542 @@
-// ==========================================
-// 90 DAY TRACKER — VERSION 2
-// Day 1 = August 16, 2026
-// ==========================================
+/* =========================================================
+   SZN2WEIGHTLOSS — 90 DAY TRACKER
+   APP.JS
+   ========================================================= */
 
-const START_DATE = new Date("2026-08-16T00:00:00");
+"use strict";
 
-const CALORIE_TARGETS = [
-  900,800,900,1000,950,1100,1150,900,800,900,
-  1000,950,1100,1150,900,800,900,950,1000,1100,
-  1150,900,800,950,1000,950,1100,1150,900,900,
-  700,900,1100,1200,700,900,1100,1200,700,900,
-  1100,1200,700,900,1100,1200,700,900,1100,1200,
-  700,900,1100,1200,700,900,1100,1200,700,900,
-  1200,1100,900,1000,800,800,900,1000,1200,800,
-  850,800,1000,950,1200,900,800,900,800,800,
-  700,950,900,850,1200,850,800,900,900,1200
+/* =========================================================
+   90-DAY CALORIE TARGETS
+   ========================================================= */
+
+const calorieTargets = [
+  900, 800, 900, 1000, 950,
+  1100, 1150, 900, 800, 900,
+  1000, 950, 1100, 1150, 900,
+  800, 900, 950, 1000, 1100,
+  1150, 900, 800, 950, 1000,
+  950, 1100, 1150, 900, 900,
+
+  700, 900, 1100, 1200, 700,
+  900, 1100, 1200, 700, 900,
+  1100, 1200, 700, 900, 1100,
+  1200, 700, 900, 900, 1100,
+  1200, 700, 900, 1100, 1200,
+  700, 900, 1100, 1200, 700,
+  900,
+
+  1200, 1100, 900, 1000, 800,
+  800, 900, 1000, 1200, 800,
+  850, 800, 1000, 950, 1200,
+  900, 800, 900, 800, 800,
+  700, 950, 900, 850, 1200,
+  850, 800, 900, 900, 1200
 ];
 
-// ==========================================
-// FOOD DATABASE
-// ==========================================
+/*
+   Safety check.
 
-const FOOD_DATABASE = [
+   Your list contains 90 days, but extremely low calorie
+   targets can be unsafe. The tracker records the targets
+   you supplied, but it does NOT recommend prolonged
+   very-low-calorie dieting or water fasting.
+*/
 
-  // PROTEINS
-  ["Chicken breast","4 oz",187,35,0],
-  ["Chicken thigh","4 oz",229,30,0],
-  ["Chicken tenderloin","4 oz",180,34,0],
-  ["Ground turkey 93% lean","4 oz",200,22,0],
-  ["Ground turkey 99% lean","4 oz",170,28,0],
-  ["Lean ground beef","4 oz",220,28,0],
-  ["Extra lean ground beef","4 oz",190,28,0],
-  ["Steak","4 oz",250,32,0],
-  ["Sirloin steak","4 oz",230,31,0],
-  ["Salmon","4 oz",233,25,0],
-  ["Tilapia","4 oz",145,30,0],
-  ["Shrimp","4 oz",120,23,0],
-  ["Tuna in water","1 can",120,27,0],
-  ["Turkey breast deli meat","3 oz",90,18,0],
-  ["Turkey bacon","2 slices",70,6,0],
-  ["Chicken sausage","1 link",140,13,1],
-  ["Turkey sausage","1 link",100,10,1],
+const TOTAL_DAYS = 90;
 
-  // EGGS / DAIRY
-  ["Egg","1 large",72,6.3,0],
-  ["Egg whites","3 large",51,10.8,0],
-  ["Greek yogurt nonfat","1 cup",130,23,0],
-  ["Greek yogurt 2%","1 cup",150,20,0],
-  ["Cottage cheese low fat","1 cup",180,24,0],
-  ["Cottage cheese nonfat","1 cup",160,28,0],
-  ["String cheese","1 stick",80,7,0],
-  ["Mozzarella","1 oz",85,6,0],
-  ["Cheddar cheese","1 oz",114,7,0],
-  ["Parmesan","1 tbsp",21,1.9,0],
-  ["Milk 2%","1 cup",122,8,0],
-  ["Unsweetened almond milk","1 cup",30,1,1],
 
-  // PROTEIN PRODUCTS
-  ["Protein shake","1 serving",150,30,3],
-  ["Protein powder","1 scoop",120,24,2],
-  ["Protein bar","1 bar",200,20,5],
-  ["Protein yogurt","1 container",140,20,2],
-  ["Protein pudding","1 serving",150,20,3],
+/* =========================================================
+   START DATE
+   Tomorrow = August 16, 2026
+   ========================================================= */
 
-  // GRAINS / CARBS
-  ["White rice cooked","1/2 cup",103,2.1,0.3],
-  ["Brown rice cooked","1/2 cup",108,2.5,1.8],
-  ["Quinoa cooked","1/2 cup",111,4,2.6],
-  ["Oatmeal cooked","1/2 cup",75,2.5,2],
-  ["Pasta cooked","1 cup",200,7,2.5],
-  ["Whole wheat bread","1 slice",80,4,2],
-  ["White bread","1 slice",75,2.5,0.7],
-  ["Whole wheat tortilla","1 tortilla",130,5,4],
-  ["Low carb tortilla","1 tortilla",70,5,11],
-  ["Corn tortilla","1 tortilla",52,1.4,1.5],
-  ["Rice cakes","1 cake",35,0.7,0.3],
-  ["Granola","1/4 cup",130,3,2],
+const START_DATE = new Date(2026, 7, 16);
 
-  // POTATOES
-  ["Baked potato","1 medium",160,4,4],
-  ["Sweet potato","1 medium",103,2.3,3.8],
-  ["French fries","1 small serving",220,3,3],
-  ["Hash browns","1 serving",140,2,2],
 
-  // BEANS
-  ["Black beans","1/2 cup",114,7.5,7.5],
-  ["Pinto beans","1/2 cup",122,7.7,7.7],
-  ["Kidney beans","1/2 cup",112,7.6,6.4],
-  ["Chickpeas","1/2 cup",135,7,6],
-  ["Lentils","1/2 cup",115,9,8],
+/* =========================================================
+   STORAGE
+   ========================================================= */
 
-  // VEGETABLES
-  ["Broccoli","1 cup",55,3.7,5.1],
-  ["Spinach","2 cups",14,1.8,1.4],
-  ["Green beans","1 cup",44,2.4,4],
-  ["Cauliflower","1 cup",27,2.1,2.1],
-  ["Brussels sprouts","1 cup",56,4,3.8],
-  ["Asparagus","1 cup",40,4.3,3.6],
-  ["Bell pepper","1 medium",31,1,2.1],
-  ["Cucumber","1 cup",16,0.7,0.5],
-  ["Tomato","1 medium",22,1.1,1.5],
-  ["Lettuce","2 cups",10,0.8,1],
-  ["Carrots","1 cup",52,1.2,3.6],
-  ["Zucchini","1 cup",27,2,1.8],
-  ["Mushrooms","1 cup",15,2.2,0.7],
-  ["Onion","1/2 cup",32,0.9,1.4],
-  ["Corn","1/2 cup",77,2.6,2.1],
+const STORAGE_KEY = "szn2weightloss90Data";
 
-  // FRUIT
-  ["Strawberries","1 cup",49,1,3],
-  ["Blueberries","1 cup",84,1.1,3.6],
-  ["Raspberries","1 cup",64,1.5,8],
-  ["Blackberries","1 cup",62,2,7.6],
-  ["Apple","1 medium",95,0.5,4.4],
-  ["Banana","1 medium",105,1.3,3.1],
-  ["Orange","1 medium",62,1.2,3.1],
-  ["Grapes","1 cup",104,1.1,1.4],
-  ["Pineapple","1 cup",82,0.9,2.3],
-  ["Mango","1 cup",99,1.4,2.6],
-  ["Watermelon","1 cup",46,0.9,0.6],
-  ["Peach","1 medium",59,1.4,2.3],
-  ["Cherries","1 cup",97,1.6,3.2],
-
-  // FATS
-  ["Avocado","1/2 avocado",120,1.5,5],
-  ["Almonds","1 oz",164,6,3.5],
-  ["Walnuts","1 oz",185,4.3,1.9],
-  ["Peanut butter","1 tbsp",95,3.5,1],
-  ["Almond butter","1 tbsp",98,3.4,1.6],
-  ["Olive oil","1 tsp",40,0,0],
-  ["Olive oil","1 tbsp",119,0,0],
-
-  // SAUCES / EXTRAS
-  ["Hummus","2 tbsp",70,2,2],
-  ["Salsa","2 tbsp",10,0.5,1],
-  ["Guacamole","2 tbsp",50,1,2],
-  ["Light ranch","2 tbsp",60,0,0],
-  ["Hot sauce","1 tbsp",5,0,0],
-  ["Ketchup","1 tbsp",20,0,0],
-  ["Mustard","1 tbsp",10,0.5,0],
-  ["Light mayonnaise","1 tbsp",35,0,0],
-
-  // COMMON RESTAURANT ITEMS
-  ["Chipotle chicken","4 oz",180,32,0],
-  ["Chipotle steak","4 oz",150,21,0],
-  ["Chipotle black beans","1/2 serving",65,4,5],
-  ["Chipotle brown rice","1/2 serving",105,2,1],
-  ["CAVA grilled chicken","4 oz",180,32,0],
-  ["CAVA hummus","2 tbsp",70,2,2],
-  ["Jimmy John's turkey","3 oz",90,18,0],
-
-  // SNACKS
-  ["Popcorn air-popped","3 cups",93,3,3],
-  ["Pretzels","1 oz",108,3,1],
-  ["Dark chocolate","1 oz",170,2,2],
-  ["Rice crackers","1 oz",110,2,1],
-  ["Jerky","1 oz",80,11,0]
-].map((f,index)=>({
-  id:index,
-  name:f[0],
-  serving:f[1],
-  calories:f[2],
-  protein:f[3],
-  fiber:f[4]
-}));
-
-// ==========================================
-// STATE
-// ==========================================
+let trackerData = loadData();
 
 let currentDay = getInitialDay();
-let currentView = "today";
 
-function getInitialDay(){
 
-  const today = new Date();
-  today.setHours(0,0,0,0);
+/* =========================================================
+   FOOD DATABASE
+   ========================================================= */
 
-  const start = new Date(START_DATE);
-  start.setHours(0,0,0,0);
+const foodDatabase = [
 
-  let difference =
-    Math.floor((today-start)/86400000);
+  /* PROTEINS */
 
-  if(difference < 0) difference = 0;
-  if(difference > 89) difference = 89;
+  {
+    name: "Chicken breast",
+    serving: "4 oz",
+    calories: 187,
+    protein: 35,
+    fiber: 0
+  },
 
-  return difference;
-}
+  {
+    name: "Chicken thigh",
+    serving: "4 oz",
+    calories: 210,
+    protein: 28,
+    fiber: 0
+  },
 
-function storageKey(){
+  {
+    name: "93% lean ground turkey",
+    serving: "4 oz",
+    calories: 170,
+    protein: 22,
+    fiber: 0
+  },
 
-  return `90day-v2-day-${currentDay+1}`;
+  {
+    name: "Lean ground beef 90%",
+    serving: "4 oz",
+    calories: 200,
+    protein: 22,
+    fiber: 0
+  },
 
-}
+  {
+    name: "Sirloin steak",
+    serving: "4 oz",
+    calories: 220,
+    protein: 32,
+    fiber: 0
+  },
 
-function blankDay(){
+  {
+    name: "Salmon",
+    serving: "4 oz",
+    calories: 233,
+    protein: 25,
+    fiber: 0
+  },
 
-  return {
-    foods:[],
-    water:"",
-    steps:"",
-    weight:"",
-    workout:"",
-    workoutMinutes:"",
-    fasting:"",
-    notes:"",
-    complete:false
-  };
+  {
+    name: "Tuna in water",
+    serving: "1 can",
+    calories: 120,
+    protein: 26,
+    fiber: 0
+  },
 
-}
+  {
+    name: "Shrimp",
+    serving: "4 oz",
+    calories: 120,
+    protein: 23,
+    fiber: 0
+  },
 
-function getDay(){
+  {
+    name: "Turkey bacon",
+    serving: "3 slices",
+    calories: 90,
+    protein: 6,
+    fiber: 0
+  },
 
-  const saved =
-    localStorage.getItem(storageKey());
+  {
+    name: "Egg",
+    serving: "1 large",
+    calories: 72,
+    protein: 6,
+    fiber: 0
+  },
 
-  if(!saved) return blankDay();
+  {
+    name: "Egg whites",
+    serving: "1/2 cup",
+    calories: 63,
+    protein: 13,
+    fiber: 0
+  },
 
-  try{
+  /* DAIRY */
+
+  {
+    name: "Greek yogurt nonfat",
+    serving: "1 cup",
+    calories: 130,
+    protein: 23,
+    fiber: 0
+  },
+
+  {
+    name: "Cottage cheese low fat",
+    serving: "1 cup",
+    calories: 180,
+    protein: 24,
+    fiber: 0
+  },
+
+  {
+    name: "String cheese",
+    serving: "1 stick",
+    calories: 80,
+    protein: 7,
+    fiber: 0
+  },
+
+  /* FRUIT */
+
+  {
+    name: "Strawberries",
+    serving: "1 cup",
+    calories: 49,
+    protein: 1,
+    fiber: 3
+  },
+
+  {
+    name: "Blueberries",
+    serving: "1 cup",
+    calories: 84,
+    protein: 1,
+    fiber: 3.6
+  },
+
+  {
+    name: "Raspberries",
+    serving: "1 cup",
+    calories: 64,
+    protein: 1.5,
+    fiber: 8
+  },
+
+  {
+    name: "Blackberries",
+    serving: "1 cup",
+    calories: 62,
+    protein: 2,
+    fiber: 7.6
+  },
+
+  {
+    name: "Apple",
+    serving: "1 medium",
+    calories: 95,
+    protein: 0.5,
+    fiber: 4.4
+  },
+
+  {
+    name: "Banana",
+    serving: "1 medium",
+    calories: 105,
+    protein: 1.3,
+    fiber: 3.1
+  },
+
+  {
+    name: "Orange",
+    serving: "1 medium",
+    calories: 62,
+    protein: 1.2,
+    fiber: 3.1
+  },
+
+  {
+    name: "Cherries",
+    serving: "1 cup",
+    calories: 97,
+    protein: 1.6,
+    fiber: 3.2
+  },
+
+  /* VEGETABLES */
+
+  {
+    name: "Broccoli",
+    serving: "1 cup",
+    calories: 55,
+    protein: 3.7,
+    fiber: 5.1
+  },
+
+  {
+    name: "Green beans",
+    serving: "1 cup",
+    calories: 31,
+    protein: 1.8,
+    fiber: 3.4
+  },
+
+  {
+    name: "Spinach",
+    serving: "2 cups",
+    calories: 14,
+    protein: 1.8,
+    fiber: 1.4
+  },
+
+  {
+    name: "Romaine lettuce",
+    serving: "2 cups",
+    calories: 16,
+    protein: 1.2,
+    fiber: 2
+  },
+
+  {
+    name: "Cucumber",
+    serving: "1 cup",
+    calories: 16,
+    protein: 0.7,
+    fiber: 0.5
+  },
+
+  {
+    name: "Bell pepper",
+    serving: "1 medium",
+    calories: 31,
+    protein: 1,
+    fiber: 2.1
+  },
+
+  {
+    name: "Tomato",
+    serving: "1 medium",
+    calories: 22,
+    protein: 1.1,
+    fiber: 1.5
+  },
+
+  {
+    name: "Avocado",
+    serving: "1/2 medium",
+    calories: 120,
+    protein: 1.5,
+    fiber: 5
+  },
+
+  {
+    name: "Corn",
+    serving: "1/2 cup",
+    calories: 77,
+    protein: 2.9,
+    fiber: 2.1
+  },
+
+  /* CARBS */
+
+  {
+    name: "White rice",
+    serving: "1/2 cup cooked",
+    calories: 103,
+    protein: 2.1,
+    fiber: 0.3
+  },
+
+  {
+    name: "Brown rice",
+    serving: "1/2 cup cooked",
+    calories: 108,
+    protein: 2.5,
+    fiber: 1.8
+  },
+
+  {
+    name: "Black beans",
+    serving: "1/2 cup",
+    calories: 114,
+    protein: 7.6,
+    fiber: 7.5
+  },
+
+  {
+    name: "Pinto beans",
+    serving: "1/2 cup",
+    calories: 122,
+    protein: 7.7,
+    fiber: 7.7
+  },
+
+  {
+    name: "Sweet potato",
+    serving: "1 medium",
+    calories: 103,
+    protein: 2.3,
+    fiber: 3.8
+  },
+
+  {
+    name: "Potato",
+    serving: "1 medium",
+    calories: 161,
+    protein: 4.3,
+    fiber: 3.9
+  },
+
+  /* SNACKS / OTHER */
+
+  {
+    name: "Protein shake",
+    serving: "1 serving",
+    calories: 150,
+    protein: 25,
+    fiber: 3
+  },
+
+  {
+    name: "Protein bar",
+    serving: "1 bar",
+    calories: 200,
+    protein: 20,
+    fiber: 5
+  },
+
+  {
+    name: "Protein chips",
+    serving: "1 bag",
+    calories: 140,
+    protein: 19,
+    fiber: 4
+  },
+
+  {
+    name: "Almonds",
+    serving: "1 oz",
+    calories: 164,
+    protein: 6,
+    fiber: 3.5
+  },
+
+  {
+    name: "Peanut butter",
+    serving: "1 tbsp",
+    calories: 95,
+    protein: 3.5,
+    fiber: 1
+  },
+
+  {
+    name: "Hummus",
+    serving: "2 tbsp",
+    calories: 70,
+    protein: 2,
+    fiber: 2
+  },
+
+  {
+    name: "Olive oil",
+    serving: "1 tsp",
+    calories: 40,
+    protein: 0,
+    fiber: 0
+  },
+
+  {
+    name: "Light ranch",
+    serving: "2 tbsp",
+    calories: 60,
+    protein: 1,
+    fiber: 0
+  },
+
+  {
+    name: "Salsa",
+    serving: "2 tbsp",
+    calories: 10,
+    protein: 0.5,
+    fiber: 1
+  },
+
+  {
+    name: "Low carb tortilla",
+    serving: "1 tortilla",
+    calories: 70,
+    protein: 5,
+    fiber: 11
+  }
+];
+
+
+/* =========================================================
+   INITIALIZE
+   ========================================================= */
+
+document.addEventListener("DOMContentLoaded", () => {
+
+  setupButtons();
+
+  renderDay();
+
+  renderCalendar();
+
+  renderDashboard();
+
+});
+
+
+/* =========================================================
+   STORAGE FUNCTIONS
+   ========================================================= */
+
+function loadData() {
+
+  try {
+
+    const saved = localStorage.getItem(STORAGE_KEY);
+
+    if (!saved) {
+      return {};
+    }
 
     return JSON.parse(saved);
 
-  }catch{
+  } catch (error) {
 
-    return blankDay();
+    console.error("Could not load saved data:", error);
+
+    return {};
 
   }
-
 }
 
-function saveDay(data){
+
+function saveData() {
 
   localStorage.setItem(
-    storageKey(),
-    JSON.stringify(data)
+    STORAGE_KEY,
+    JSON.stringify(trackerData)
   );
 
 }
 
-// ==========================================
-// DATE
-// ==========================================
 
-function dateForDay(day){
+/* =========================================================
+   DAY HELPERS
+   ========================================================= */
 
-  const d = new Date(START_DATE);
+function getInitialDay() {
 
-  d.setDate(
-    d.getDate()+day
-  );
+  const today = new Date();
 
-  return d;
+  const difference =
+    Math.floor(
+      (today - START_DATE) /
+      (1000 * 60 * 60 * 24)
+    );
+
+  if (difference < 0) {
+    return 1;
+  }
+
+  if (difference >= TOTAL_DAYS) {
+    return TOTAL_DAYS;
+  }
+
+  return difference + 1;
 
 }
 
-function formatDate(date){
+
+function getDateForDay(day) {
+
+  const date = new Date(START_DATE);
+
+  date.setDate(
+    START_DATE.getDate() + day - 1
+  );
+
+  return date;
+
+}
+
+
+function formatDate(date) {
 
   return date.toLocaleDateString(
-    "en-US",
+    undefined,
     {
-      weekday:"long",
-      month:"long",
-      day:"numeric",
-      year:"numeric"
+      weekday: "long",
+      month: "long",
+      day: "numeric",
+      year: "numeric"
     }
   );
 
 }
 
-// ==========================================
-// TOTALS
-// ==========================================
 
-function getTotals(data){
+function getDayData(day) {
 
-  return data.foods.reduce(
-    (total,food)=>{
+  if (!trackerData[day]) {
+
+    trackerData[day] = {
+      foods: [],
+      water: "",
+      steps: "",
+      weight: "",
+      workoutMinutes: "",
+      workout: "",
+      fasting: "",
+      notes: "",
+      completed: false
+    };
+
+  }
+
+  return trackerData[day];
+
+}
+
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+function setupButtons() {
+
+  const next = document.getElementById("nextDay");
+
+  const previous = document.getElementById("prevDay");
+
+  const today = document.getElementById("todayBtn");
+
+  const addFood = document.getElementById("addFoodBtn");
+
+  const closeModal =
+    document.getElementById("closeFoodModal");
+
+
+  if (next) {
+
+    next.addEventListener(
+      "click",
+      () => {
+
+        if (currentDay < TOTAL_DAYS) {
+
+          currentDay++;
+
+          renderEverything();
+
+        }
+
+      }
+    );
+
+  }
+
+
+  if (previous) {
+
+    previous.addEventListener(
+      "click",
+      () => {
+
+        if (currentDay > 1) {
+
+          currentDay--;
+
+          renderEverything();
+
+        }
+
+      }
+    );
+
+  }
+
+
+  if (today) {
+
+    today.addEventListener(
+      "click",
+      () => {
+
+        currentDay =
+          getInitialDay();
+
+        renderEverything();
+
+      }
+    );
+
+  }
+
+
+  if (addFood) {
+
+    addFood.addEventListener(
+      "click",
+      openFoodModal
+    );
+
+  }
+
+
+  if (closeModal) {
+
+    closeModal.addEventListener(
+      "click",
+      closeFoodModal
+    );
+
+  }
+
+
+  setupInputListeners();
+
+}
+
+
+/* =========================================================
+   RENDER EVERYTHING
+   ========================================================= */
+
+function renderEverything() {
+
+  renderDay();
+
+  renderCalendar();
+
+  renderDashboard();
+
+}
+
+
+/* =========================================================
+   RENDER CURRENT DAY
+   ========================================================= */
+
+function renderDay() {
+
+  const data =
+    getDayData(currentDay);
+
+  const target =
+    calorieTargets[currentDay - 1];
+
+
+  const dayLabel =
+    document.getElementById("dayLabel");
+
+  if (dayLabel) {
+
+    dayLabel.textContent =
+      `Day ${currentDay} of ${TOTAL_DAYS}`;
+
+  }
+
+
+  const dateLabel =
+    document.getElementById("dateLabel");
+
+  if (dateLabel) {
+
+    dateLabel.textContent =
+      formatDate(
+        getDateForDay(currentDay)
+      );
+
+  }
+
+
+  const targetCalories =
+    document.getElementById(
+      "targetCalories"
+    );
+
+  if (targetCalories) {
+
+    targetCalories.textContent =
+      target;
+
+  }
+
+
+  const caloriesGoal =
+    document.getElementById(
+      "caloriesGoal"
+    );
+
+  if (caloriesGoal) {
+
+    caloriesGoal.textContent =
+      target;
+
+  }
+
+
+  const totals =
+    calculateTotals(data.foods);
+
+
+  setText(
+    "caloriesTotal",
+    Math.round(totals.calories)
+  );
+
+  setText(
+    "proteinTotal",
+    roundNumber(totals.protein)
+  );
+
+  setText(
+    "fiberTotal",
+    roundNumber(totals.fiber)
+  );
+
+
+  const water =
+    Number(data.water) || 0;
+
+  setText(
+    "waterTotal",
+    water
+  );
+
+
+  const remaining =
+    target - totals.calories;
+
+
+  const remainingElement =
+    document.getElementById(
+      "remainingCalories"
+    );
+
+  if (remainingElement) {
+
+    if (remaining >= 0) {
+
+      remainingElement.textContent =
+        `${Math.round(remaining)} remaining`;
+
+    } else {
+
+      remainingElement.textContent =
+        `${Math.abs(Math.round(remaining))} over`;
+
+    }
+
+  }
+
+
+  const progress =
+    document.getElementById(
+      "calorieProgress"
+    );
+
+  if (progress) {
+
+    const percentage =
+      Math.min(
+        100,
+        (totals.calories / target) * 100
+      );
+
+    progress.style.width =
+      `${percentage}%`;
+
+  }
+
+
+  renderFoodList(data.foods);
+
+  populateInputs(data);
+
+}
+
+
+/* =========================================================
+   FOOD TOTALS
+   ========================================================= */
+
+function calculateTotals(foods) {
+
+  return foods.reduce(
+    (total, food) => {
 
       total.calories +=
-        food.calories*food.quantity;
+        Number(food.calories) || 0;
 
       total.protein +=
-        food.protein*food.quantity;
+        Number(food.protein) || 0;
 
       total.fiber +=
-        food.fiber*food.quantity;
+        Number(food.fiber) || 0;
 
       return total;
 
     },
     {
-      calories:0,
-      protein:0,
-      fiber:0
+      calories: 0,
+      protein: 0,
+      fiber: 0
     }
   );
 
 }
 
-// ==========================================
-// DASHBOARD
-// ==========================================
 
-function render(){
+/* =========================================================
+   FOOD LIST
+   ========================================================= */
 
-  document.getElementById(
-    "dayLabel"
-  ).textContent =
-    `Day ${currentDay+1} of 90`;
+function renderFoodList(foods) {
 
-  document.querySelectorAll(
-    ".bottom-nav button"
-  ).forEach(button=>{
-
-    button.classList.toggle(
-      "active",
-      button.dataset.view===currentView
+  const list =
+    document.getElementById(
+      "foodList"
     );
 
-  });
+  if (!list) return;
 
-  if(currentView==="today")
-    renderToday();
 
-  if(currentView==="calendar")
-    renderCalendar();
+  if (!foods.length) {
 
-  if(currentView==="progress")
-    renderProgress();
+    list.innerHTML =
+      `<p class="empty">
+        No food logged yet.
+      </p>`;
 
-  if(currentView==="foods")
-    renderFoodsPage();
+    return;
 
-  if(currentView==="settings")
-    renderSettings();
-
-}
-
-// ==========================================
-// TODAY SCREEN
-// ==========================================
-
-function renderToday(){
-
-  const data=getDay();
-
-  const totals=getTotals(data);
-
-  const target=
-    CALORIE_TARGETS[currentDay];
-
-  const remaining=
-    target-totals.calories;
-
-  const percentage=
-    Math.min(
-      100,
-      totals.calories/target*100
-    );
-
-  const date=
-    dateForDay(currentDay);
-
-  document.getElementById("app").innerHTML=`
-
-  <section class="card date-card">
-
-    <button class="circle"
-      onclick="changeDay(-1)">
-      ‹
-    </button>
-
-    <div class="center">
-
-      <strong>
-        ${formatDate(date)}
-      </strong>
-
-      <div class="muted">
-        Day ${currentDay+1}
-      </div>
-
-      <div class="target">
-        ${target}
-        <span>cal</span>
-      </div>
-
-    </div>
-
-    <button class="circle"
-      onclick="changeDay(1)">
-      ›
-    </button>
-
-  </section>
-
-  ${
-    target<=800
-    ?
-    `<div class="warning">
-      <strong>Very-low-calorie day</strong><br>
-      This target comes from the schedule you entered.
-      700–800 calories is a medically very-low intake and
-      should not be used routinely without professional
-      supervision.
-    </div>`
-    :
-    ""
   }
 
-  <section class="stats">
 
-    <div class="stat">
-      <small>Calories</small>
-      <strong>
-        ${Math.round(totals.calories)}
-      </strong>
-      <small>
-        / ${target}
-      </small>
-    </div>
+  list.innerHTML =
+    foods.map(
+      (food, index) => `
 
-    <div class="stat">
-      <small>Protein</small>
-      <strong>
-        ${Math.round(totals.protein)}g
-      </strong>
-      <small>
-        goal 150g
-      </small>
-    </div>
+        <div class="food-row">
 
-    <div class="stat">
-      <small>Fiber</small>
-      <strong>
-        ${Math.round(totals.fiber)}g
-      </strong>
-      <small>
-        goal 25g+
-      </small>
-    </div>
+          <div>
 
-    <div class="stat">
-      <small>Water</small>
-      <strong>
-        ${data.water||0}
-      </strong>
-      <small>
-        / 80 oz
-      </small>
-    </div>
+            <b>
+              ${escapeHtml(food.name)}
+            </b>
 
-  </section>
-
-  <section class="card">
-
-    <div class="section-title">
-
-      <strong>
-        Daily calories
-      </strong>
-
-      <span class="muted">
-
-        ${
-          remaining>=0
-          ?
-          `${Math.round(remaining)} remaining`
-          :
-          `${Math.abs(Math.round(remaining))} over`
-        }
-
-      </span>
-
-    </div>
-
-    <div class="progress">
-
-      <div style="
-        width:${percentage}%
-      "></div>
-
-    </div>
-
-  </section>
-
-  <section class="card">
-
-    <div class="section-title">
-
-      <h2>Food</h2>
-
-      <button
-        class="primary"
-        onclick="openFoodSearch()">
-
-        + Add Food
-
-      </button>
-
-    </div>
-
-    <div>
-
-      ${
-        data.foods.length
-
-        ?
-
-        data.foods.map(
-          (food,index)=>`
-
-          <div class="food-row">
-
-            <div>
-
-              <strong>
-                ${escapeHTML(food.name)}
-              </strong>
-
-              <small>
-                ${food.quantity} ×
-                ${escapeHTML(food.serving)}
-              </small>
-
-            </div>
-
-            <div class="food-right">
-
-              <strong>
-                ${Math.round(
-                  food.calories*food.quantity
-                )} cal
-              </strong>
-
-              <small>
-                ${Math.round(
-                  food.protein*food.quantity
-                )}g protein
-              </small>
-
-              <button
-                class="delete"
-                onclick="deleteFood(${index})">
-
-                ×
-
-              </button>
-
-            </div>
+            <small>
+              ${escapeHtml(food.serving || "")}
+            </small>
 
           </div>
 
-          `
-        ).join("")
-
-        :
-
-        `<p class="empty">
-          No food logged yet.
-        </p>`
-
-      }
-
-    </div>
-
-  </section>
-
-  <section class="card">
-
-    <h2>Daily tracking</h2>
-
-    <div class="input-grid">
-
-      <label>
-        Water (oz)
-        <input
-          id="water"
-          type="number"
-          value="${escapeHTML(data.water)}">
-      </label>
-
-      <label>
-        Steps
-        <input
-          id="steps"
-          type="number"
-          value="${escapeHTML(data.steps)}">
-      </label>
-
-      <label>
-        Weight (lb)
-        <input
-          id="weight"
-          type="number"
-          step=".1"
-          value="${escapeHTML(data.weight)}">
-      </label>
-
-      <label>
-        Workout minutes
-        <input
-          id="workoutMinutes"
-          type="number"
-          value="${escapeHTML(data.workoutMinutes)}">
-      </label>
-
-    </div>
-
-    <label class="full">
-
-      Workout
-
-      <select id="workout">
-
-        <option value="">
-          None
-        </option>
-
-        <option ${
-          data.workout==="Pilates"
-          ?"selected":""
-        }>
-          Pilates
-        </option>
-
-        <option ${
-          data.workout==="Barre"
-          ?"selected":""
-        }>
-          Barre
-        </option>
-
-        <option ${
-          data.workout==="Walking"
-          ?"selected":""
-        }>
-          Walking
-        </option>
-
-        <option ${
-          data.workout==="13-3-30"
-          ?"selected":""
-        }>
-          13-3-30
-        </option>
-
-        <option ${
-          data.workout==="Strength"
-          ?"selected":""
-        }>
-          Strength
-        </option>
-
-        <option ${
-          data.workout==="Other"
-          ?"selected":""
-        }>
-          Other
-        </option>
-
-      </select>
-
-    </label>
-
-    <label class="full">
-
-      Fasting window
-
-      <input
-        id="fasting"
-        value="${escapeHTML(data.fasting)}"
-        placeholder="Example: 8 PM – 10 AM">
-
-    </label>
-
-    <label class="full">
-
-      Notes
-
-      <textarea id="notes">
-${escapeHTML(data.notes)}</textarea>
-
-    </label>
-
-    <label class="complete">
-
-      <input
-        id="complete"
-        type="checkbox"
-        ${data.complete?"checked":""}>
-
-      Mark day complete
-
-    </label>
-
-  </section>
-
-  `;
-
-  attachInputs();
-
-}
-
-// ==========================================
-// INPUTS
-// ==========================================
-
-function attachInputs(){
-
-  const fields=[
-    "water",
-    "steps",
-    "weight",
-    "workoutMinutes",
-    "workout",
-    "fasting",
-    "notes"
-  ];
-
-  fields.forEach(field=>{
-
-    const element=
-      document.getElementById(field);
-
-    element.addEventListener(
-      "input",
-      ()=>{
-
-        const data=getDay();
-
-        data[field]=
-          element.value;
-
-        saveDay(data);
-
-      }
-    );
-
-  });
-
-  document.getElementById(
-    "complete"
-  ).addEventListener(
-    "change",
-    event=>{
-
-      const data=getDay();
-
-      data.complete=
-        event.target.checked;
-
-      saveDay(data);
-
-    }
-  );
-
-}
-
-// ==========================================
-// CHANGE DAY
-// ==========================================
-
-function changeDay(amount){
-
-  currentDay+=amount;
-
-  if(currentDay<0)
-    currentDay=0;
-
-  if(currentDay>89)
-    currentDay=89;
-
-  render();
-
-}
-
-// ==========================================
-// FOOD SEARCH
-// ==========================================
-
-function openFoodSearch(){
-
-  const modal=
-    document.getElementById("modal");
-
-  modal.classList.remove("hidden");
-
-  modal.innerHTML=`
-
-    <div class="sheet">
-
-      <div class="section-title">
-
-        <h2>
-          Add Food
-        </h2>
-
-        <button
-          onclick="closeModal()">
-
-          ×
-
-        </button>
-
-      </div>
-
-      <input
-        id="foodSearch"
-        class="search"
-        placeholder="Search chicken, yogurt, rice..."
-        autofocus>
-
-      <div id="foodResults"></div>
-
-    </div>
-
-  `;
-
-  document.getElementById(
-    "foodSearch"
-  ).addEventListener(
-    "input",
-    event=>{
-
-      searchFoods(
-        event.target.value
-      );
-
-    }
-  );
-
-  searchFoods("");
-
-}
-
-function searchFoods(query){
-
-  const results=
-    document.getElementById(
-      "foodResults"
-    );
-
-  const custom=
-    getCustomFoods();
-
-  const database=[
-    ...FOOD_DATABASE,
-    ...custom
-  ];
-
-  const term=
-    query.toLowerCase().trim();
-
-  const matches=
-    database.filter(food=>
-      food.name
-        .toLowerCase()
-        .includes(term)
-    ).slice(0,40);
-
-  results.innerHTML=
-    matches.map(
-      food=>`
-
-      <button
-        class="food-result"
-        onclick='selectFood(${JSON.stringify(food)})'>
-
-        <strong>
-          ${escapeHTML(food.name)}
-        </strong>
-
-        <small>
-          ${escapeHTML(food.serving)}
-          · ${food.calories} cal
-          · ${food.protein}g protein
-          · ${food.fiber}g fiber
-        </small>
-
-      </button>
+          <div>
+
+            <b>
+              ${roundNumber(food.calories)}
+              cal
+            </b>
+
+            <small>
+              ${roundNumber(food.protein)}g protein
+              ·
+              ${roundNumber(food.fiber)}g fiber
+            </small>
+
+          </div>
+
+          <button
+            class="delete-food"
+            data-index="${index}"
+            aria-label="Delete food"
+          >
+            ×
+          </button>
+
+        </div>
 
       `
     ).join("");
 
-}
 
-// ==========================================
-// ADD FOOD
-// ==========================================
+  list
+    .querySelectorAll(".delete-food")
+    .forEach(button => {
 
-function selectFood(food){
+      button.addEventListener(
+        "click",
+        () => {
 
-  const quantity=
-    prompt(
-      `How many servings of ${food.name}?`,
-      "1"
-    );
+          const index =
+            Number(
+              button.dataset.index
+            );
 
-  if(quantity===null)
-    return;
+          deleteFood(index);
 
-  const amount=
-    Number(quantity);
+        }
+      );
 
-  if(!amount || amount<=0)
-    return;
-
-  const data=getDay();
-
-  data.foods.push({
-
-    name:food.name,
-    serving:food.serving,
-    calories:food.calories,
-    protein:food.protein,
-    fiber:food.fiber,
-    quantity:amount
-
-  });
-
-  saveDay(data);
-
-  closeModal();
-
-  render();
+    });
 
 }
 
-// ==========================================
-// DELETE FOOD
-// ==========================================
 
-function deleteFood(index){
+/* =========================================================
+   DELETE FOOD
+   ========================================================= */
 
-  const data=getDay();
+function deleteFood(index) {
+
+  const data =
+    getDayData(currentDay);
 
   data.foods.splice(
     index,
     1
   );
 
-  saveDay(data);
+  saveData();
 
-  render();
+  renderEverything();
 
 }
 
-// ==========================================
-// CALENDAR
-// ==========================================
 
-function renderCalendar(){
+/* =========================================================
+   FOOD MODAL
+   ========================================================= */
 
-  let html=`
+function openFoodModal() {
 
-    <section class="card">
+  const modal =
+    document.getElementById(
+      "foodModal"
+    );
 
-      <h2>
-        90-Day Calendar
-      </h2>
+  if (!modal) return;
 
-      <p class="muted">
-        Tap any day to open it.
-      </p>
+  modal.classList.remove(
+    "hidden"
+  );
 
-      <div class="calendar">
 
-  `;
+  const search =
+    document.getElementById(
+      "foodSearch"
+    );
 
-  for(
-    let i=0;
-    i<90;
-    i++
-  ){
+  if (search) {
 
-    const saved=
-      localStorage.getItem(
-        `90day-v2-day-${i+1}`
+    search.value = "";
+
+    setTimeout(
+      () => search.focus(),
+      50
+    );
+
+  }
+
+
+  renderFoodResults(
+    foodDatabase
+  );
+
+}
+
+
+function closeFoodModal() {
+
+  const modal =
+    document.getElementById(
+      "foodModal"
+    );
+
+  if (!modal) return;
+
+  modal.classList.add(
+    "hidden"
+  );
+
+}
+
+
+function renderFoodResults(foods) {
+
+  const results =
+    document.getElementById(
+      "foodResults"
+    );
+
+  if (!results) return;
+
+
+  if (!foods.length) {
+
+    results.innerHTML =
+      `<p class="empty">
+        No foods found.
+      </p>`;
+
+    return;
+
+  }
+
+
+  results.innerHTML =
+    foods.map(
+      (food, index) => `
+
+        <button
+          class="food-result"
+          data-food-index="${index}"
+          type="button"
+        >
+
+          <b>
+            ${escapeHtml(food.name)}
+          </b>
+
+          <small>
+            ${escapeHtml(food.serving)}
+            ·
+            ${food.calories} calories
+            ·
+            ${food.protein}g protein
+            ·
+            ${food.fiber}g fiber
+          </small>
+
+        </button>
+
+      `
+    ).join("");
+
+
+  results
+    .querySelectorAll(".food-result")
+    .forEach(button => {
+
+      button.addEventListener(
+        "click",
+        () => {
+
+          const index =
+            Number(
+              button.dataset.foodIndex
+            );
+
+          addFoodToDay(
+            foodDatabase[index]
+          );
+
+        }
       );
 
-    let logged=false;
+    });
 
-    if(saved){
+}
 
-      const data=
-        JSON.parse(saved);
 
-      logged=
-        data.complete ||
-        data.foods.length>0 ||
-        data.water ||
-        data.steps ||
-        data.weight ||
-        data.workout;
+/* =========================================================
+   SEARCH
+   ========================================================= */
+
+document.addEventListener(
+  "input",
+  event => {
+
+    if (
+      event.target.id !==
+      "foodSearch"
+    ) {
+      return;
+    }
+
+
+    const search =
+      event.target.value
+        .trim()
+        .toLowerCase();
+
+
+    if (!search) {
+
+      renderFoodResults(
+        foodDatabase
+      );
+
+      return;
 
     }
 
-    html+=`
+
+    const filtered =
+      foodDatabase.filter(
+        food =>
+          food.name
+            .toLowerCase()
+            .includes(search)
+      );
+
+
+    renderFoodResults(
+      filtered
+    );
+
+  }
+);
+
+
+/* =========================================================
+   ADD FOOD
+   ========================================================= */
+
+function addFoodToDay(food) {
+
+  const data =
+    getDayData(currentDay);
+
+
+  data.foods.push({
+
+    name: food.name,
+
+    serving: food.serving,
+
+    calories: Number(food.calories),
+
+    protein: Number(food.protein),
+
+    fiber: Number(food.fiber)
+
+  });
+
+
+  saveData();
+
+  closeFoodModal();
+
+  renderEverything();
+
+}
+
+
+/* =========================================================
+   INPUT TRACKING
+   ========================================================= */
+
+function setupInputListeners() {
+
+  const fields = [
+
+    "waterInput",
+    "stepsInput",
+    "weightInput",
+    "workoutInput",
+    "workoutSelect",
+    "fastingInput",
+    "notesInput"
+
+  ];
+
+
+  fields.forEach(id => {
+
+    const element =
+      document.getElementById(id);
+
+    if (!element) return;
+
+
+    element.addEventListener(
+      "input",
+      saveCurrentDayInputs
+    );
+
+    element.addEventListener(
+      "change",
+      saveCurrentDayInputs
+    );
+
+  });
+
+}
+
+
+function saveCurrentDayInputs() {
+
+  const data =
+    getDayData(currentDay);
+
+
+  const water =
+    document.getElementById(
+      "waterInput"
+    );
+
+  const steps =
+    document.getElementById(
+      "stepsInput"
+    );
+
+  const weight =
+    document.getElementById(
+      "weightInput"
+    );
+
+  const workoutInput =
+    document.getElementById(
+      "workoutInput"
+    );
+
+  const workoutSelect =
+    document.getElementById(
+      "workoutSelect"
+    );
+
+  const fasting =
+    document.getElementById(
+      "fastingInput"
+    );
+
+  const notes =
+    document.getElementById(
+      "notesInput"
+    );
+
+
+  if (water) {
+    data.water = water.value;
+  }
+
+  if (steps) {
+    data.steps = steps.value;
+  }
+
+  if (weight) {
+    data.weight = weight.value;
+  }
+
+  if (workoutInput) {
+    data.workoutMinutes =
+      workoutInput.value;
+  }
+
+  if (workoutSelect) {
+    data.workout =
+      workoutSelect.value;
+  }
+
+  if (fasting) {
+    data.fasting =
+      fasting.value;
+  }
+
+  if (notes) {
+    data.notes =
+      notes.value;
+  }
+
+
+  data.completed =
+    isDayCompleted(data);
+
+
+  saveData();
+
+  renderCalendar();
+
+  renderDashboard();
+
+}
+
+
+/* =========================================================
+   POPULATE INPUTS
+   ========================================================= */
+
+function populateInputs(data) {
+
+  setInput(
+    "waterInput",
+    data.water
+  );
+
+  setInput(
+    "stepsInput",
+    data.steps
+  );
+
+  setInput(
+    "weightInput",
+    data.weight
+  );
+
+  setInput(
+    "workoutInput",
+    data.workoutMinutes
+  );
+
+  setInput(
+    "workoutSelect",
+    data.workout
+  );
+
+  setInput(
+    "fastingInput",
+    data.fasting
+  );
+
+  setInput(
+    "notesInput",
+    data.notes
+  );
+
+}
+
+
+function setInput(id, value) {
+
+  const element =
+    document.getElementById(id);
+
+  if (element) {
+
+    element.value =
+      value || "";
+
+  }
+
+}
+
+
+/* =========================================================
+   COMPLETION
+   ========================================================= */
+
+function isDayCompleted(data) {
+
+  return (
+    data.foods.length > 0 ||
+    data.water ||
+    data.steps ||
+    data.weight ||
+    data.workoutMinutes ||
+    data.workout ||
+    data.fasting ||
+    data.notes
+  );
+
+}
+
+
+/* =========================================================
+   CALENDAR
+   ========================================================= */
+
+function renderCalendar() {
+
+  const calendar =
+    document.getElementById(
+      "calendarGrid"
+    );
+
+  if (!calendar) return;
+
+
+  let html = "";
+
+
+  for (
+    let day = 1;
+    day <= TOTAL_DAYS;
+    day++
+  ) {
+
+    const data =
+      getDayData(day);
+
+    const target =
+      calorieTargets[day - 1];
+
+    const totals =
+      calculateTotals(
+        data.foods
+      );
+
+
+    let status = "";
+
+
+    if (
+      totals.calories >
+      target
+    ) {
+
+      status = "over";
+
+    } else if (
+      data.foods.length > 0
+    ) {
+
+      status = "logged";
+
+    }
+
+
+    if (
+      day === currentDay
+    ) {
+
+      status += " current";
+
+    }
+
+
+    const date =
+      getDateForDay(day);
+
+
+    html += `
 
       <button
-        class="
-          calendar-day
-          ${i===currentDay?"selected":""}
-          ${logged?"logged":""}
-        "
-        onclick="openDay(${i})">
+        class="calendar-day ${status}"
+        data-day="${day}"
+        type="button"
+      >
+
+        <span class="calendar-day-number">
+          Day ${day}
+        </span>
 
         <strong>
-          ${i+1}
+          ${date.toLocaleDateString(
+            undefined,
+            {
+              month: "short",
+              day: "numeric"
+            }
+          )}
         </strong>
 
-        <small>
-          ${CALORIE_TARGETS[i]}
-        </small>
+        <span>
+          Target:
+          ${target} cal
+        </span>
+
+        <span>
+          Logged:
+          ${Math.round(
+            totals.calories
+          )} cal
+        </span>
+
+        ${
+          data.weight
+            ? `
+              <span>
+                Weight:
+                ${data.weight} lb
+              </span>
+            `
+            : ""
+        }
 
       </button>
 
@@ -1022,784 +1544,866 @@ function renderCalendar(){
 
   }
 
-  html+=`
 
-      </div>
+  calendar.innerHTML =
+    html;
 
-    </section>
 
-  `;
+  calendar
+    .querySelectorAll(
+      ".calendar-day"
+    )
+    .forEach(button => {
 
-  document.getElementById(
-    "app"
-  ).innerHTML=html;
+      button.addEventListener(
+        "click",
+        () => {
 
-}
+          currentDay =
+            Number(
+              button.dataset.day
+            );
 
-function openDay(day){
+          renderEverything();
 
-  currentDay=day;
+          window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+          });
 
-  currentView="today";
-
-  render();
-
-}
-
-// ==========================================
-// PROGRESS DASHBOARD
-// ==========================================
-
-function renderProgress(){
-
-  let completed=0;
-
-  let weights=[];
-
-  let workoutDays=0;
-
-  let totalSteps=0;
-
-  for(
-    let i=0;
-    i<90;
-    i++
-  ){
-
-    const saved=
-      localStorage.getItem(
-        `90day-v2-day-${i+1}`
+        }
       );
 
-    if(!saved)
-      continue;
+    });
 
-    const data=
-      JSON.parse(saved);
 
-    if(data.complete)
+  updateCompletedLabel();
+
+}
+
+
+/* =========================================================
+   COMPLETED LABEL
+   ========================================================= */
+
+function updateCompletedLabel() {
+
+  const element =
+    document.getElementById(
+      "completedLabel"
+    );
+
+  if (!element) return;
+
+
+  let completed = 0;
+
+
+  for (
+    let day = 1;
+    day <= TOTAL_DAYS;
+    day++
+  ) {
+
+    if (
+      isDayCompleted(
+        getDayData(day)
+      )
+    ) {
+
       completed++;
 
-    if(data.weight)
-      weights.push({
+    }
 
-        day:i+1,
-        weight:Number(data.weight)
+  }
 
-      });
 
-    if(
-      Number(data.workoutMinutes)>0
-    )
+  element.textContent =
+    `${completed} / ${TOTAL_DAYS} days`;
+
+}
+
+
+/* =========================================================
+   DASHBOARD
+   ========================================================= */
+
+function renderDashboard() {
+
+  const weights = [];
+
+  const dates = [];
+
+  let totalCalories = 0;
+
+  let totalProtein = 0;
+
+  let totalFiber = 0;
+
+  let workoutDays = 0;
+
+
+  for (
+    let day = 1;
+    day <= TOTAL_DAYS;
+    day++
+  ) {
+
+    const data =
+      getDayData(day);
+
+    const totals =
+      calculateTotals(
+        data.foods
+      );
+
+
+    totalCalories +=
+      totals.calories;
+
+    totalProtein +=
+      totals.protein;
+
+    totalFiber +=
+      totals.fiber;
+
+
+    if (
+      data.workoutMinutes ||
+      data.workout
+    ) {
+
       workoutDays++;
 
-    totalSteps+=
-      Number(data.steps)||0;
+    }
+
+
+    if (
+      data.weight !== "" &&
+      data.weight !== null &&
+      data.weight !== undefined
+    ) {
+
+      weights.push(
+        Number(data.weight)
+      );
+
+      dates.push(
+        getDateForDay(day)
+      );
+
+    }
 
   }
 
-  const firstWeight=
+
+  const averageCalories =
     weights.length
-    ?
-    weights[0].weight
-    :
-    null;
+      ? totalCalories / Math.max(1, getLoggedDays())
+      : 0;
 
-  const latestWeight=
-    weights.length
-    ?
-    weights[weights.length-1].weight
-    :
-    null;
 
-  let change="—";
+  setText(
+    "averageCalories",
+    Math.round(
+      averageCalories
+    )
+  );
 
-  if(
-    firstWeight!==null &&
-    latestWeight!==null
-  ){
 
-    change=
-      (
-        latestWeight-
-        firstWeight
-      ).toFixed(1);
+  setText(
+    "workoutDays",
+    workoutDays
+  );
 
-  }
 
-  document.getElementById(
-    "app"
-  ).innerHTML=`
+  if (weights.length) {
 
-    <section class="card">
+    const first =
+      weights[0];
 
-      <h2>
-        90-Day Progress
-      </h2>
+    const latest =
+      weights[weights.length - 1];
 
-      <div class="stats">
+    const change =
+      latest - first;
 
-        <div class="stat">
 
-          <small>
-            Days completed
-          </small>
-
-          <strong>
-            ${completed}/90
-          </strong>
-
-        </div>
-
-        <div class="stat">
-
-          <small>
-            Workout days
-          </small>
-
-          <strong>
-            ${workoutDays}
-          </strong>
-
-        </div>
-
-        <div class="stat">
-
-          <small>
-            Starting weight
-          </small>
-
-          <strong>
-            ${
-              firstWeight!==null
-              ?
-              firstWeight
-              :
-              "—"
-            }
-          </strong>
-
-        </div>
-
-        <div class="stat">
-
-          <small>
-            Latest weight
-          </small>
-
-          <strong>
-            ${
-              latestWeight!==null
-              ?
-              latestWeight
-              :
-              "—"
-            }
-          </strong>
-
-        </div>
-
-      </div>
-
-    </section>
-
-    <section class="card">
-
-      <h2>
-        Weight change
-      </h2>
-
-      <div class="big-number">
-
-        ${
-          change==="—"
-          ?
-          "Add your weights"
-          :
-          `${change} lb`
-        }
-
-      </div>
-
-      <p class="muted">
-        Weight change is calculated from
-        your first and latest logged weights.
-      </p>
-
-    </section>
-
-    <section class="card">
-
-      <h2>
-        Weight entries
-      </h2>
-
-      ${
-        weights.length
-
-        ?
-
-        weights.map(
-          entry=>`
-
-          <span class="pill">
-
-            Day ${entry.day}:
-            ${entry.weight} lb
-
-          </span>
-
-          `
-        ).join("")
-
-        :
-
-        `<p class="muted">
-          Start entering your weight
-          on the Today page.
-        </p>`
-
-      }
-
-    </section>
-
-  `;
-
-}
-
-// ==========================================
-// CUSTOM FOODS
-// ==========================================
-
-function getCustomFoods(){
-
-  const saved=
-    localStorage.getItem(
-      "90day-custom-foods"
+    setText(
+      "weightChange",
+      `${change > 0 ? "+" : ""}${roundNumber(change)} lb`
     );
 
-  if(!saved)
-    return [];
+  } else {
 
-  try{
-
-    return JSON.parse(saved);
-
-  }catch{
-
-    return [];
+    setText(
+      "weightChange",
+      "—"
+    );
 
   }
 
-}
 
-function renderFoodsPage(){
+  renderWeightChart(
+    weights,
+    dates
+  );
 
-  const custom=
-    getCustomFoods();
 
-  document.getElementById(
-    "app"
-  ).innerHTML=`
-
-    <section class="card">
-
-      <div class="section-title">
-
-        <h2>
-          My Foods
-        </h2>
-
-        <button
-          class="primary"
-          onclick="createCustomFood()">
-
-          + Add Food
-
-        </button>
-
-      </div>
-
-      <p class="muted">
-        Save foods you eat frequently.
-      </p>
-
-      ${
-        custom.length
-
-        ?
-
-        custom.map(
-          (food,index)=>`
-
-          <div class="food-row">
-
-            <div>
-
-              <strong>
-                ${escapeHTML(food.name)}
-              </strong>
-
-              <small>
-                ${escapeHTML(food.serving)}
-              </small>
-
-            </div>
-
-            <div>
-
-              ${food.calories} cal
-
-            </div>
-
-            <button
-              class="delete"
-              onclick="removeCustomFood(${index})">
-
-              ×
-
-            </button>
-
-          </div>
-
-          `
-        ).join("")
-
-        :
-
-        `<p class="empty">
-          No custom foods yet.
-        </p>`
-
-      }
-
-    </section>
-
-  `;
+  renderWeeklySummary();
 
 }
 
-function createCustomFood(){
 
-  const modal=
+/* =========================================================
+   WEIGHT CHART
+   ========================================================= */
+
+function renderWeightChart(
+  weights,
+  dates
+) {
+
+  const container =
     document.getElementById(
-      "modal"
+      "weightChart"
     );
 
-  modal.classList.remove("hidden");
+  if (!container) return;
 
-  modal.innerHTML=`
 
-    <div class="sheet">
+  if (!weights.length) {
 
-      <div class="section-title">
+    container.innerHTML = `
 
-        <h2>
-          Create Food
-        </h2>
+      <div class="single-weight">
 
-        <button onclick="closeModal()">
-          ×
-        </button>
+        <strong>
+          No weight data yet
+        </strong>
 
-      </div>
-
-      <label>
-        Food name
-        <input id="customName">
-      </label>
-
-      <label class="full">
-        Serving
-        <input
-          id="customServing"
-          placeholder="1 cup, 4 oz, etc.">
-      </label>
-
-      <div class="input-grid">
-
-        <label>
-          Calories
-          <input
-            id="customCalories"
-            type="number">
-        </label>
-
-        <label>
-          Protein (g)
-          <input
-            id="customProtein"
-            type="number">
-        </label>
-
-        <label>
-          Fiber (g)
-          <input
-            id="customFiber"
-            type="number">
-        </label>
+        <span>
+          Enter your weight on the
+          daily tracker to build your graph.
+        </span>
 
       </div>
 
-      <button
-        class="primary"
-        style="margin-top:15px"
-        onclick="saveCustomFood()">
+    `;
 
-        Save Food
+    return;
 
-      </button>
+  }
+
+
+  if (weights.length === 1) {
+
+    container.innerHTML = `
+
+      <div class="single-weight">
+
+        <strong>
+          ${roundNumber(weights[0])} lb
+        </strong>
+
+        <span>
+          ${formatDate(dates[0])}
+        </span>
+
+        <p>
+          Add another weight entry to
+          see the change over time.
+        </p>
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+  const width = 900;
+
+  const height = 310;
+
+  const padding = 45;
+
+
+  const minWeight =
+    Math.min(...weights) - 3;
+
+  const maxWeight =
+    Math.max(...weights) + 3;
+
+
+  const range =
+    Math.max(
+      1,
+      maxWeight - minWeight
+    );
+
+
+  const points =
+    weights.map(
+      (weight, index) => {
+
+        const x =
+          padding +
+          (
+            index /
+            (weights.length - 1)
+          ) *
+          (
+            width -
+            padding * 2
+          );
+
+
+        const y =
+          height -
+          padding -
+          (
+            (
+              weight -
+              minWeight
+            ) /
+            range
+          ) *
+          (
+            height -
+            padding * 2
+          );
+
+
+        return {
+          x,
+          y,
+          weight
+        };
+
+      }
+    );
+
+
+  const line =
+    points
+      .map(
+        point =>
+          `${point.x},${point.y}`
+      )
+      .join(" ");
+
+
+  const circles =
+    points
+      .map(
+        point => `
+
+          <circle
+            cx="${point.x}"
+            cy="${point.y}"
+            r="5"
+          />
+
+        `
+      )
+      .join("");
+
+
+  const firstWeight =
+    weights[0];
+
+  const lastWeight =
+    weights[weights.length - 1];
+
+
+  container.innerHTML = `
+
+    <svg
+      class="chart-svg"
+      viewBox="0 0 ${width} ${height}"
+      preserveAspectRatio="none"
+      aria-label="Weight change graph"
+    >
+
+      <line
+        x1="${padding}"
+        y1="${padding}"
+        x2="${width - padding}"
+        y2="${padding}"
+      />
+
+      <line
+        x1="${padding}"
+        y1="${height / 2}"
+        x2="${width - padding}"
+        y2="${height / 2}"
+      />
+
+      <line
+        x1="${padding}"
+        y1="${height - padding}"
+        x2="${width - padding}"
+        y2="${height - padding}"
+      />
+
+      <text
+        x="5"
+        y="${padding + 4}"
+      >
+        ${Math.round(maxWeight)}
+      </text>
+
+      <text
+        x="5"
+        y="${height / 2 + 4}"
+      >
+        ${Math.round(
+          (maxWeight + minWeight) / 2
+        )}
+      </text>
+
+      <text
+        x="5"
+        y="${height - padding + 4}"
+      >
+        ${Math.round(minWeight)}
+      </text>
+
+      <polyline
+        class="weight-line"
+        points="${line}"
+      />
+
+      ${circles}
+
+      <text
+        x="${padding}"
+        y="${height - 10}"
+      >
+        Start:
+        ${roundNumber(firstWeight)}
+      </text>
+
+      <text
+        x="${width - 145}"
+        y="${height - 10}"
+      >
+        Latest:
+        ${roundNumber(lastWeight)}
+      </text>
+
+    </svg>
+
+  `;
+
+}
+
+
+/* =========================================================
+   WEEKLY SUMMARY
+   ========================================================= */
+
+function renderWeeklySummary() {
+
+  const container =
+    document.getElementById(
+      "weeklySummary"
+    );
+
+  if (!container) return;
+
+
+  let html = `
+
+    <div class="weekly-table-container">
+
+      <table class="weekly-table">
+
+        <thead>
+
+          <tr>
+            <th>Week</th>
+            <th>Start weight</th>
+            <th>End weight</th>
+            <th>Change</th>
+            <th>Workout days</th>
+          </tr>
+
+        </thead>
+
+        <tbody>
+
+  `;
+
+
+  for (
+    let week = 1;
+    week <= 13;
+    week++
+  ) {
+
+    const startDay =
+      (week - 1) * 7 + 1;
+
+    const endDay =
+      Math.min(
+        week * 7,
+        TOTAL_DAYS
+      );
+
+
+    const startWeight =
+      findWeight(
+        startDay,
+        endDay
+      );
+
+
+    const endWeight =
+      findLastWeight(
+        startDay,
+        endDay
+      );
+
+
+    let workoutDays = 0;
+
+
+    for (
+      let day = startDay;
+      day <= endDay;
+      day++
+    ) {
+
+      const data =
+        getDayData(day);
+
+      if (
+        data.workout ||
+        data.workoutMinutes
+      ) {
+
+        workoutDays++;
+
+      }
+
+    }
+
+
+    let change = "—";
+
+
+    if (
+      startWeight !== null &&
+      endWeight !== null
+    ) {
+
+      const difference =
+        endWeight - startWeight;
+
+      change =
+        `${difference > 0 ? "+" : ""}${roundNumber(difference)} lb`;
+
+    }
+
+
+    html += `
+
+      <tr>
+
+        <td>
+          Week ${week}
+        </td>
+
+        <td>
+          ${
+            startWeight !== null
+              ? `${roundNumber(startWeight)} lb`
+              : "—"
+          }
+        </td>
+
+        <td>
+          ${
+            endWeight !== null
+              ? `${roundNumber(endWeight)} lb`
+              : "—"
+          }
+        </td>
+
+        <td>
+          ${change}
+        </td>
+
+        <td>
+          ${workoutDays}
+        </td>
+
+      </tr>
+
+    `;
+
+  }
+
+
+  html += `
+
+        </tbody>
+
+      </table>
 
     </div>
 
   `;
 
-}
 
-function saveCustomFood(){
-
-  const food={
-
-    id:Date.now(),
-
-    name:
-      document.getElementById(
-        "customName"
-      ).value,
-
-    serving:
-      document.getElementById(
-        "customServing"
-      ).value,
-
-    calories:Number(
-      document.getElementById(
-        "customCalories"
-      ).value
-    ),
-
-    protein:Number(
-      document.getElementById(
-        "customProtein"
-      ).value
-    ),
-
-    fiber:Number(
-      document.getElementById(
-        "customFiber"
-      ).value
-    )
-
-  };
-
-  if(!food.name)
-    return;
-
-  const foods=
-    getCustomFoods();
-
-  foods.push(food);
-
-  localStorage.setItem(
-    "90day-custom-foods",
-    JSON.stringify(foods)
-  );
-
-  closeModal();
-
-  render();
+  container.innerHTML =
+    html;
 
 }
 
-function removeCustomFood(index){
 
-  const foods=
-    getCustomFoods();
+/* =========================================================
+   WEIGHT HELPERS
+   ========================================================= */
 
-  foods.splice(
-    index,
-    1
-  );
+function findWeight(
+  startDay,
+  endDay
+) {
 
-  localStorage.setItem(
-    "90day-custom-foods",
-    JSON.stringify(foods)
-  );
+  for (
+    let day = startDay;
+    day <= endDay;
+    day++
+  ) {
 
-  render();
+    const weight =
+      getDayData(day).weight;
 
-}
+    if (
+      weight !== "" &&
+      weight !== null &&
+      weight !== undefined
+    ) {
 
-// ==========================================
-// SETTINGS / BACKUP
-// ==========================================
-
-function renderSettings(){
-
-  document.getElementById(
-    "app"
-  ).innerHTML=`
-
-    <section class="card">
-
-      <h2>
-        Backup & Data
-      </h2>
-
-      <p class="muted">
-        Your tracker data is stored
-        locally on this device.
-      </p>
-
-      <button
-        class="primary"
-        onclick="exportBackup()">
-
-        Export My Data
-
-      </button>
-
-      <button
-        onclick="document.getElementById('importFile').click()">
-
-        Import Backup
-
-      </button>
-
-      <input
-        id="importFile"
-        type="file"
-        accept=".json"
-        hidden
-        onchange="importBackup(event)">
-
-    </section>
-
-    <section class="card">
-
-      <h2>
-        About your schedule
-      </h2>
-
-      <div class="warning">
-
-        Your calorie schedule was entered
-        exactly from the numbers you supplied.
-
-        Several days are 700–800 calories.
-        Those are very-low-calorie intakes and
-        should not be treated as routine targets
-        without medical supervision.
-
-      </div>
-
-    </section>
-
-  `;
-
-}
-
-function exportBackup(){
-
-  const backup={
-
-    version:2,
-
-    exported:
-      new Date().toISOString(),
-
-    days:{},
-
-    customFoods:
-      getCustomFoods()
-
-  };
-
-  for(
-    let i=1;
-    i<=90;
-    i++
-  ){
-
-    const saved=
-      localStorage.getItem(
-        `90day-v2-day-${i}`
-      );
-
-    if(saved){
-
-      backup.days[i]=
-        JSON.parse(saved);
+      return Number(weight);
 
     }
 
   }
 
-  const blob=
-    new Blob(
-      [
-        JSON.stringify(
-          backup,
-          null,
-          2
-        )
-      ],
-      {
-        type:"application/json"
-      }
-    );
-
-  const url=
-    URL.createObjectURL(blob);
-
-  const link=
-    document.createElement("a");
-
-  link.href=url;
-
-  link.download=
-    "90-day-tracker-backup.json";
-
-  link.click();
-
-  URL.revokeObjectURL(url);
+  return null;
 
 }
 
-function importBackup(event){
 
-  const file=
-    event.target.files[0];
+function findLastWeight(
+  startDay,
+  endDay
+) {
 
-  if(!file)
-    return;
+  for (
+    let day = endDay;
+    day >= startDay;
+    day--
+  ) {
 
-  const reader=
-    new FileReader();
+    const weight =
+      getDayData(day).weight;
 
-  reader.onload=()=>{
+    if (
+      weight !== "" &&
+      weight !== null &&
+      weight !== undefined
+    ) {
 
-    try{
-
-      const backup=
-        JSON.parse(
-          reader.result
-        );
-
-      Object.entries(
-        backup.days||{}
-      ).forEach(
-        ([day,data])=>{
-
-          localStorage.setItem(
-            `90day-v2-day-${day}`,
-            JSON.stringify(data)
-          );
-
-        }
-      );
-
-      localStorage.setItem(
-        "90day-custom-foods",
-        JSON.stringify(
-          backup.customFoods||[]
-        )
-      );
-
-      alert(
-        "Backup imported successfully."
-      );
-
-      render();
-
-    }catch{
-
-      alert(
-        "That backup file could not be read."
-      );
+      return Number(weight);
 
     }
 
-  };
+  }
 
-  reader.readAsText(file);
-
-}
-
-// ==========================================
-// MODAL
-// ==========================================
-
-function closeModal(){
-
-  document.getElementById(
-    "modal"
-  ).classList.add("hidden");
-
-  document.getElementById(
-    "modal"
-  ).innerHTML="";
+  return null;
 
 }
 
-// ==========================================
-// HELPERS
-// ==========================================
 
-function escapeHTML(value){
+/* =========================================================
+   UTILITY
+   ========================================================= */
 
-  return String(
-    value ?? ""
-  )
-  .replaceAll("&","&amp;")
-  .replaceAll("<","&lt;")
-  .replaceAll(">","&gt;")
-  .replaceAll('"',"&quot;")
-  .replaceAll("'","&#039;");
+function getLoggedDays() {
 
-}
+  let count = 0;
 
-// ==========================================
-// NAVIGATION
-// ==========================================
+  for (
+    let day = 1;
+    day <= TOTAL_DAYS;
+    day++
+  ) {
 
-document.querySelectorAll(
-  ".bottom-nav button"
-).forEach(button=>{
+    const data =
+      getDayData(day);
 
-  button.addEventListener(
-    "click",
-    ()=>{
+    if (
+      data.foods.length ||
+      data.weight ||
+      data.water ||
+      data.steps ||
+      data.workout
+    ) {
 
-      currentView=
-        button.dataset.view;
-
-      render();
+      count++;
 
     }
+
+  }
+
+  return count;
+
+}
+
+
+function roundNumber(number) {
+
+  const value =
+    Number(number);
+
+  if (
+    Number.isInteger(value)
+  ) {
+
+    return value;
+
+  }
+
+  return Number(
+    value.toFixed(1)
   );
 
-});
+}
 
-document.getElementById(
-  "todayBtn"
-).addEventListener(
+
+function setText(
+  id,
+  value
+) {
+
+  const element =
+    document.getElementById(id);
+
+  if (element) {
+
+    element.textContent =
+      value;
+
+  }
+
+}
+
+
+function escapeHtml(value) {
+
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+
+}
+
+
+/* =========================================================
+   CLOSE MODAL WHEN CLICKING OUTSIDE
+   ========================================================= */
+
+document.addEventListener(
   "click",
-  ()=>{
+  event => {
 
-    currentDay=
-      getInitialDay();
+    const modal =
+      document.getElementById(
+        "foodModal"
+      );
 
-    currentView=
-      "today";
+    if (!modal) return;
 
-    render();
+
+    if (
+      event.target === modal
+    ) {
+
+      closeFoodModal();
+
+    }
 
   }
 );
 
-// ==========================================
-// START
-// ==========================================
 
-render();
+/* =========================================================
+   ESCAPE KEY
+   ========================================================= */
+
+document.addEventListener(
+  "keydown",
+  event => {
+
+    if (
+      event.key !== "Escape"
+    ) {
+      return;
+    }
+
+    closeFoodModal();
+
+  }
+);
+
+
+/* =========================================================
+   EXPOSE DATA FOR DEBUGGING
+   ========================================================= */
+
+window.SZN2WeightLoss = {
+
+  getData: () =>
+    JSON.parse(
+      JSON.stringify(
+        trackerData
+      )
+    ),
+
+  getCurrentDay: () =>
+    currentDay,
+
+  getTargets: () =>
+    [...calorieTargets],
+
+  clearAllData: () => {
+
+    const confirmed =
+      confirm(
+        "Delete ALL 90-day tracker data? This cannot be undone."
+      );
+
+    if (!confirmed) return;
+
+    localStorage.removeItem(
+      STORAGE_KEY
+    );
+
+    trackerData = {};
+
+    currentDay = 1;
+
+    renderEverything();
+
+  }
+
+};
