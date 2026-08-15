@@ -1,79 +1,42 @@
-/* =========================================================
-   SZN2WEIGHTLOSS — 90 DAY TRACKER
-   APP.JS
-   ========================================================= */
-
 "use strict";
 
-/* =========================================================
-   90-DAY CALORIE TARGETS
-   ========================================================= */
-
-const calorieTargets = [
-  900, 800, 900, 1000, 950,
-  1100, 1150, 900, 800, 900,
-  1000, 950, 1100, 1150, 900,
-  800, 900, 950, 1000, 1100,
-  1150, 900, 800, 950, 1000,
-  950, 1100, 1150, 900, 900,
-
-  700, 900, 1100, 1200, 700,
-  900, 1100, 1200, 700, 900,
-  1100, 1200, 700, 900, 1100,
-  1200, 700, 900, 900, 1100,
-  1200, 700, 900, 1100, 1200,
-  700, 900, 1100, 1200, 700,
-  900,
-
-  1200, 1100, 900, 1000, 800,
-  800, 900, 1000, 1200, 800,
-  850, 800, 1000, 950, 1200,
-  900, 800, 900, 800, 800,
-  700, 950, 900, 850, 1200,
-  850, 800, 900, 900, 1200
-];
-
-/*
-   Safety check.
-
-   Your list contains 90 days, but extremely low calorie
-   targets can be unsafe. The tracker records the targets
-   you supplied, but it does NOT recommend prolonged
-   very-low-calorie dieting or water fasting.
-*/
-
-const TOTAL_DAYS = 90;
-
 
 /* =========================================================
-   START DATE
-   Tomorrow = August 16, 2026
-   ========================================================= */
+   SETTINGS
+========================================================= */
 
 const START_DATE = new Date(2026, 7, 16);
+const SPECIAL_CALORIES = 1800;
+const STORAGE_KEY = "szn2weightloss_v6";
 
 
 /* =========================================================
-   STORAGE
-   ========================================================= */
+   YOUR 90-DAY CALORIE PLAN
+========================================================= */
 
-const STORAGE_KEY = "szn2weightloss90Data";
+const CALORIE_TARGETS = [
+  900, 800, 900, 1000, 950, 1100, 1150, 900, 800, 900,
+  1000, 950, 1100, 1150, 900, 800, 900, 950, 1000, 1100,
+  1150, 900, 800, 950, 1000, 950, 1100, 1150, 900, 900,
 
-let trackerData = loadData();
+  700, 900, 1100, 1200, 700, 900, 1100, 1200, 700, 900,
+  1100, 1200, 700, 900, 1100, 1200, 700, 900, 900, 1100,
+  1200, 700, 900, 1100, 1200, 700, 900, 1100, 1200, 700,
 
-let currentDay = getInitialDay();
+  1200, 1100, 900, 1000, 800, 800, 900, 1000, 1200, 800,
+  850, 800, 1000, 950, 1200, 900, 800, 900, 800, 800,
+  700, 950, 900, 850, 1200, 850, 800, 900, 900, 1200
+];
 
 
 /* =========================================================
    FOOD DATABASE
-   ========================================================= */
+========================================================= */
 
-const foodDatabase = [
-
-  /* PROTEINS */
+const FOOD_DATABASE = [
 
   {
-    name: "Chicken breast",
+    name: "Chicken Breast",
     serving: "4 oz",
     calories: 187,
     protein: 35,
@@ -81,7 +44,7 @@ const foodDatabase = [
   },
 
   {
-    name: "Chicken thigh",
+    name: "Chicken Thigh",
     serving: "4 oz",
     calories: 210,
     protein: 28,
@@ -89,7 +52,7 @@ const foodDatabase = [
   },
 
   {
-    name: "93% lean ground turkey",
+    name: "Ground Turkey 93%",
     serving: "4 oz",
     calories: 170,
     protein: 22,
@@ -97,7 +60,7 @@ const foodDatabase = [
   },
 
   {
-    name: "Lean ground beef 90%",
+    name: "Ground Beef 90%",
     serving: "4 oz",
     calories: 200,
     protein: 22,
@@ -105,7 +68,7 @@ const foodDatabase = [
   },
 
   {
-    name: "Sirloin steak",
+    name: "Sirloin Steak",
     serving: "4 oz",
     calories: 220,
     protein: 32,
@@ -121,14 +84,6 @@ const foodDatabase = [
   },
 
   {
-    name: "Tuna in water",
-    serving: "1 can",
-    calories: 120,
-    protein: 26,
-    fiber: 0
-  },
-
-  {
     name: "Shrimp",
     serving: "4 oz",
     calories: 120,
@@ -137,10 +92,10 @@ const foodDatabase = [
   },
 
   {
-    name: "Turkey bacon",
-    serving: "3 slices",
-    calories: 90,
-    protein: 6,
+    name: "Tuna",
+    serving: "1 can",
+    calories: 120,
+    protein: 26,
     fiber: 0
   },
 
@@ -153,17 +108,15 @@ const foodDatabase = [
   },
 
   {
-    name: "Egg whites",
+    name: "Egg Whites",
     serving: "1/2 cup",
     calories: 63,
     protein: 13,
     fiber: 0
   },
 
-  /* DAIRY */
-
   {
-    name: "Greek yogurt nonfat",
+    name: "Nonfat Greek Yogurt",
     serving: "1 cup",
     calories: 130,
     protein: 23,
@@ -171,7 +124,7 @@ const foodDatabase = [
   },
 
   {
-    name: "Cottage cheese low fat",
+    name: "Cottage Cheese",
     serving: "1 cup",
     calories: 180,
     protein: 24,
@@ -179,14 +132,12 @@ const foodDatabase = [
   },
 
   {
-    name: "String cheese",
+    name: "String Cheese",
     serving: "1 stick",
     calories: 80,
     protein: 7,
     fiber: 0
   },
-
-  /* FRUIT */
 
   {
     name: "Strawberries",
@@ -252,8 +203,6 @@ const foodDatabase = [
     fiber: 3.2
   },
 
-  /* VEGETABLES */
-
   {
     name: "Broccoli",
     serving: "1 cup",
@@ -263,7 +212,7 @@ const foodDatabase = [
   },
 
   {
-    name: "Green beans",
+    name: "Green Beans",
     serving: "1 cup",
     calories: 31,
     protein: 1.8,
@@ -279,7 +228,7 @@ const foodDatabase = [
   },
 
   {
-    name: "Romaine lettuce",
+    name: "Romaine Lettuce",
     serving: "2 cups",
     calories: 16,
     protein: 1.2,
@@ -295,7 +244,7 @@ const foodDatabase = [
   },
 
   {
-    name: "Bell pepper",
+    name: "Bell Pepper",
     serving: "1 medium",
     calories: 31,
     protein: 1,
@@ -326,10 +275,8 @@ const foodDatabase = [
     fiber: 2.1
   },
 
-  /* CARBS */
-
   {
-    name: "White rice",
+    name: "White Rice",
     serving: "1/2 cup cooked",
     calories: 103,
     protein: 2.1,
@@ -337,7 +284,7 @@ const foodDatabase = [
   },
 
   {
-    name: "Brown rice",
+    name: "Brown Rice",
     serving: "1/2 cup cooked",
     calories: 108,
     protein: 2.5,
@@ -345,7 +292,7 @@ const foodDatabase = [
   },
 
   {
-    name: "Black beans",
+    name: "Black Beans",
     serving: "1/2 cup",
     calories: 114,
     protein: 7.6,
@@ -353,7 +300,7 @@ const foodDatabase = [
   },
 
   {
-    name: "Pinto beans",
+    name: "Pinto Beans",
     serving: "1/2 cup",
     calories: 122,
     protein: 7.7,
@@ -361,7 +308,7 @@ const foodDatabase = [
   },
 
   {
-    name: "Sweet potato",
+    name: "Sweet Potato",
     serving: "1 medium",
     calories: 103,
     protein: 2.3,
@@ -376,10 +323,8 @@ const foodDatabase = [
     fiber: 3.9
   },
 
-  /* SNACKS / OTHER */
-
   {
-    name: "Protein shake",
+    name: "Protein Shake",
     serving: "1 serving",
     calories: 150,
     protein: 25,
@@ -387,7 +332,7 @@ const foodDatabase = [
   },
 
   {
-    name: "Protein bar",
+    name: "Protein Bar",
     serving: "1 bar",
     calories: 200,
     protein: 20,
@@ -395,7 +340,7 @@ const foodDatabase = [
   },
 
   {
-    name: "Protein chips",
+    name: "Protein Chips",
     serving: "1 bag",
     calories: 140,
     protein: 19,
@@ -411,7 +356,7 @@ const foodDatabase = [
   },
 
   {
-    name: "Peanut butter",
+    name: "Peanut Butter",
     serving: "1 tbsp",
     calories: 95,
     protein: 3.5,
@@ -427,18 +372,10 @@ const foodDatabase = [
   },
 
   {
-    name: "Olive oil",
+    name: "Olive Oil",
     serving: "1 tsp",
     calories: 40,
     protein: 0,
-    fiber: 0
-  },
-
-  {
-    name: "Light ranch",
-    serving: "2 tbsp",
-    calories: 60,
-    protein: 1,
     fiber: 0
   },
 
@@ -451,55 +388,86 @@ const foodDatabase = [
   },
 
   {
-    name: "Low carb tortilla",
+    name: "Low Carb Tortilla",
     serving: "1 tortilla",
     calories: 70,
     protein: 5,
     fiber: 11
   }
+
 ];
 
 
 /* =========================================================
-   INITIALIZE
-   ========================================================= */
+   APPLICATION STATE
+========================================================= */
 
-document.addEventListener("DOMContentLoaded", () => {
+let currentDay = 1;
 
-  setupButtons();
+let appData = {
+  days: {},
+  customFoods: []
+};
 
-  renderDay();
 
-  renderCalendar();
+/* =========================================================
+   START
+========================================================= */
 
-  renderDashboard();
+document.addEventListener("DOMContentLoaded", function () {
+
+  loadData();
+
+  currentDay = getInitialDay();
+
+  setupNavigation();
+
+  setupDayButtons();
+
+  setupFoodButtons();
+
+  setupTrackingInputs();
+
+  renderAll();
 
 });
 
 
 /* =========================================================
-   STORAGE FUNCTIONS
-   ========================================================= */
+   STORAGE
+========================================================= */
 
 function loadData() {
 
+  const saved = localStorage.getItem(STORAGE_KEY);
+
+  if (!saved) {
+    return;
+  }
+
   try {
 
-    const saved = localStorage.getItem(STORAGE_KEY);
+    const parsed = JSON.parse(saved);
 
-    if (!saved) {
-      return {};
+    if (parsed && typeof parsed === "object") {
+
+      appData.days =
+        parsed.days || {};
+
+      appData.customFoods =
+        parsed.customFoods || [];
+
     }
-
-    return JSON.parse(saved);
 
   } catch (error) {
 
-    console.error("Could not load saved data:", error);
-
-    return {};
+    console.error(
+      "Could not load saved data.",
+      error
+    );
 
   }
+
 }
 
 
@@ -507,15 +475,58 @@ function saveData() {
 
   localStorage.setItem(
     STORAGE_KEY,
-    JSON.stringify(trackerData)
+    JSON.stringify(appData)
   );
 
 }
 
 
 /* =========================================================
-   DAY HELPERS
-   ========================================================= */
+   DAY DATA
+========================================================= */
+
+function createEmptyDay() {
+
+  return {
+
+    foods: [],
+
+    water: "",
+    steps: "",
+    weight: "",
+
+    workoutMinutes: "",
+    workout: "",
+
+    fasting: "",
+    notes: "",
+
+    special: false
+
+  };
+
+}
+
+
+function getDayData(day) {
+
+  const key = String(day);
+
+  if (!appData.days[key]) {
+
+    appData.days[key] =
+      createEmptyDay();
+
+  }
+
+  return appData.days[key];
+
+}
+
+
+/* =========================================================
+   DATES
+========================================================= */
 
 function getInitialDay() {
 
@@ -523,29 +534,34 @@ function getInitialDay() {
 
   const difference =
     Math.floor(
-      (today - START_DATE) /
-      (1000 * 60 * 60 * 24)
-    );
+      (
+        today -
+        START_DATE
+      ) / 86400000
+    ) + 1;
 
-  if (difference < 0) {
+  if (difference < 1) {
     return 1;
   }
 
-  if (difference >= TOTAL_DAYS) {
-    return TOTAL_DAYS;
+  if (difference > 90) {
+    return 90;
   }
 
-  return difference + 1;
+  return difference;
 
 }
 
 
 function getDateForDay(day) {
 
-  const date = new Date(START_DATE);
+  const date =
+    new Date(START_DATE);
 
   date.setDate(
-    START_DATE.getDate() + day - 1
+    date.getDate() +
+    day -
+    1
   );
 
   return date;
@@ -553,311 +569,32 @@ function getDateForDay(day) {
 }
 
 
-function formatDate(date) {
-
-  return date.toLocaleDateString(
-    undefined,
-    {
-      weekday: "long",
-      month: "long",
-      day: "numeric",
-      year: "numeric"
-    }
-  );
-
-}
-
-
-function getDayData(day) {
-
-  if (!trackerData[day]) {
-
-    trackerData[day] = {
-      foods: [],
-      water: "",
-      steps: "",
-      weight: "",
-      workoutMinutes: "",
-      workout: "",
-      fasting: "",
-      notes: "",
-      completed: false
-    };
-
-  }
-
-  return trackerData[day];
-
-}
-
-
 /* =========================================================
-   BUTTONS
-   ========================================================= */
+   TARGET
+========================================================= */
 
-function setupButtons() {
-
-  const next = document.getElementById("nextDay");
-
-  const previous = document.getElementById("prevDay");
-
-  const today = document.getElementById("todayBtn");
-
-  const addFood = document.getElementById("addFoodBtn");
-
-  const closeModal =
-    document.getElementById("closeFoodModal");
-
-
-  if (next) {
-
-    next.addEventListener(
-      "click",
-      () => {
-
-        if (currentDay < TOTAL_DAYS) {
-
-          currentDay++;
-
-          renderEverything();
-
-        }
-
-      }
-    );
-
-  }
-
-
-  if (previous) {
-
-    previous.addEventListener(
-      "click",
-      () => {
-
-        if (currentDay > 1) {
-
-          currentDay--;
-
-          renderEverything();
-
-        }
-
-      }
-    );
-
-  }
-
-
-  if (today) {
-
-    today.addEventListener(
-      "click",
-      () => {
-
-        currentDay =
-          getInitialDay();
-
-        renderEverything();
-
-      }
-    );
-
-  }
-
-
-  if (addFood) {
-
-    addFood.addEventListener(
-      "click",
-      openFoodModal
-    );
-
-  }
-
-
-  if (closeModal) {
-
-    closeModal.addEventListener(
-      "click",
-      closeFoodModal
-    );
-
-  }
-
-
-  setupInputListeners();
-
-}
-
-
-/* =========================================================
-   RENDER EVERYTHING
-   ========================================================= */
-
-function renderEverything() {
-
-  renderDay();
-
-  renderCalendar();
-
-  renderDashboard();
-
-}
-
-
-/* =========================================================
-   RENDER CURRENT DAY
-   ========================================================= */
-
-function renderDay() {
+function getTargetForDay(day) {
 
   const data =
-    getDayData(currentDay);
+    getDayData(day);
 
-  const target =
-    calorieTargets[currentDay - 1];
-
-
-  const dayLabel =
-    document.getElementById("dayLabel");
-
-  if (dayLabel) {
-
-    dayLabel.textContent =
-      `Day ${currentDay} of ${TOTAL_DAYS}`;
-
+  if (data.special) {
+    return SPECIAL_CALORIES;
   }
 
-
-  const dateLabel =
-    document.getElementById("dateLabel");
-
-  if (dateLabel) {
-
-    dateLabel.textContent =
-      formatDate(
-        getDateForDay(currentDay)
-      );
-
-  }
-
-
-  const targetCalories =
-    document.getElementById(
-      "targetCalories"
-    );
-
-  if (targetCalories) {
-
-    targetCalories.textContent =
-      target;
-
-  }
-
-
-  const caloriesGoal =
-    document.getElementById(
-      "caloriesGoal"
-    );
-
-  if (caloriesGoal) {
-
-    caloriesGoal.textContent =
-      target;
-
-  }
-
-
-  const totals =
-    calculateTotals(data.foods);
-
-
-  setText(
-    "caloriesTotal",
-    Math.round(totals.calories)
-  );
-
-  setText(
-    "proteinTotal",
-    roundNumber(totals.protein)
-  );
-
-  setText(
-    "fiberTotal",
-    roundNumber(totals.fiber)
-  );
-
-
-  const water =
-    Number(data.water) || 0;
-
-  setText(
-    "waterTotal",
-    water
-  );
-
-
-  const remaining =
-    target - totals.calories;
-
-
-  const remainingElement =
-    document.getElementById(
-      "remainingCalories"
-    );
-
-  if (remainingElement) {
-
-    if (remaining >= 0) {
-
-      remainingElement.textContent =
-        `${Math.round(remaining)} remaining`;
-
-    } else {
-
-      remainingElement.textContent =
-        `${Math.abs(Math.round(remaining))} over`;
-
-    }
-
-  }
-
-
-  const progress =
-    document.getElementById(
-      "calorieProgress"
-    );
-
-  if (progress) {
-
-    const percentage =
-      Math.min(
-        100,
-        (totals.calories / target) * 100
-      );
-
-    progress.style.width =
-      `${percentage}%`;
-
-  }
-
-
-  renderFoodList(data.foods);
-
-  populateInputs(data);
+  return CALORIE_TARGETS[day - 1];
 
 }
 
 
 /* =========================================================
-   FOOD TOTALS
-   ========================================================= */
+   TOTALS
+========================================================= */
 
-function calculateTotals(foods) {
+function getFoodTotals(foods) {
 
   return foods.reduce(
-    (total, food) => {
+    function (total, food) {
 
       total.calories +=
         Number(food.calories) || 0;
@@ -882,463 +619,12 @@ function calculateTotals(foods) {
 
 
 /* =========================================================
-   FOOD LIST
-   ========================================================= */
+   RENDER EVERYTHING
+========================================================= */
 
-function renderFoodList(foods) {
+function renderAll() {
 
-  const list =
-    document.getElementById(
-      "foodList"
-    );
-
-  if (!list) return;
-
-
-  if (!foods.length) {
-
-    list.innerHTML =
-      `<p class="empty">
-        No food logged yet.
-      </p>`;
-
-    return;
-
-  }
-
-
-  list.innerHTML =
-    foods.map(
-      (food, index) => `
-
-        <div class="food-row">
-
-          <div>
-
-            <b>
-              ${escapeHtml(food.name)}
-            </b>
-
-            <small>
-              ${escapeHtml(food.serving || "")}
-            </small>
-
-          </div>
-
-          <div>
-
-            <b>
-              ${roundNumber(food.calories)}
-              cal
-            </b>
-
-            <small>
-              ${roundNumber(food.protein)}g protein
-              ·
-              ${roundNumber(food.fiber)}g fiber
-            </small>
-
-          </div>
-
-          <button
-            class="delete-food"
-            data-index="${index}"
-            aria-label="Delete food"
-          >
-            ×
-          </button>
-
-        </div>
-
-      `
-    ).join("");
-
-
-  list
-    .querySelectorAll(".delete-food")
-    .forEach(button => {
-
-      button.addEventListener(
-        "click",
-        () => {
-
-          const index =
-            Number(
-              button.dataset.index
-            );
-
-          deleteFood(index);
-
-        }
-      );
-
-    });
-
-}
-
-
-/* =========================================================
-   DELETE FOOD
-   ========================================================= */
-
-function deleteFood(index) {
-
-  const data =
-    getDayData(currentDay);
-
-  data.foods.splice(
-    index,
-    1
-  );
-
-  saveData();
-
-  renderEverything();
-
-}
-
-
-/* =========================================================
-   FOOD MODAL
-   ========================================================= */
-
-function openFoodModal() {
-
-  const modal =
-    document.getElementById(
-      "foodModal"
-    );
-
-  if (!modal) return;
-
-  modal.classList.remove(
-    "hidden"
-  );
-
-
-  const search =
-    document.getElementById(
-      "foodSearch"
-    );
-
-  if (search) {
-
-    search.value = "";
-
-    setTimeout(
-      () => search.focus(),
-      50
-    );
-
-  }
-
-
-  renderFoodResults(
-    foodDatabase
-  );
-
-}
-
-
-function closeFoodModal() {
-
-  const modal =
-    document.getElementById(
-      "foodModal"
-    );
-
-  if (!modal) return;
-
-  modal.classList.add(
-    "hidden"
-  );
-
-}
-
-
-function renderFoodResults(foods) {
-
-  const results =
-    document.getElementById(
-      "foodResults"
-    );
-
-  if (!results) return;
-
-
-  if (!foods.length) {
-
-    results.innerHTML =
-      `<p class="empty">
-        No foods found.
-      </p>`;
-
-    return;
-
-  }
-
-
-  results.innerHTML =
-    foods.map(
-      (food, index) => `
-
-        <button
-          class="food-result"
-          data-food-index="${index}"
-          type="button"
-        >
-
-          <b>
-            ${escapeHtml(food.name)}
-          </b>
-
-          <small>
-            ${escapeHtml(food.serving)}
-            ·
-            ${food.calories} calories
-            ·
-            ${food.protein}g protein
-            ·
-            ${food.fiber}g fiber
-          </small>
-
-        </button>
-
-      `
-    ).join("");
-
-
-  results
-    .querySelectorAll(".food-result")
-    .forEach(button => {
-
-      button.addEventListener(
-        "click",
-        () => {
-
-          const index =
-            Number(
-              button.dataset.foodIndex
-            );
-
-          addFoodToDay(
-            foodDatabase[index]
-          );
-
-        }
-      );
-
-    });
-
-}
-
-
-/* =========================================================
-   SEARCH
-   ========================================================= */
-
-document.addEventListener(
-  "input",
-  event => {
-
-    if (
-      event.target.id !==
-      "foodSearch"
-    ) {
-      return;
-    }
-
-
-    const search =
-      event.target.value
-        .trim()
-        .toLowerCase();
-
-
-    if (!search) {
-
-      renderFoodResults(
-        foodDatabase
-      );
-
-      return;
-
-    }
-
-
-    const filtered =
-      foodDatabase.filter(
-        food =>
-          food.name
-            .toLowerCase()
-            .includes(search)
-      );
-
-
-    renderFoodResults(
-      filtered
-    );
-
-  }
-);
-
-
-/* =========================================================
-   ADD FOOD
-   ========================================================= */
-
-function addFoodToDay(food) {
-
-  const data =
-    getDayData(currentDay);
-
-
-  data.foods.push({
-
-    name: food.name,
-
-    serving: food.serving,
-
-    calories: Number(food.calories),
-
-    protein: Number(food.protein),
-
-    fiber: Number(food.fiber)
-
-  });
-
-
-  saveData();
-
-  closeFoodModal();
-
-  renderEverything();
-
-}
-
-
-/* =========================================================
-   INPUT TRACKING
-   ========================================================= */
-
-function setupInputListeners() {
-
-  const fields = [
-
-    "waterInput",
-    "stepsInput",
-    "weightInput",
-    "workoutInput",
-    "workoutSelect",
-    "fastingInput",
-    "notesInput"
-
-  ];
-
-
-  fields.forEach(id => {
-
-    const element =
-      document.getElementById(id);
-
-    if (!element) return;
-
-
-    element.addEventListener(
-      "input",
-      saveCurrentDayInputs
-    );
-
-    element.addEventListener(
-      "change",
-      saveCurrentDayInputs
-    );
-
-  });
-
-}
-
-
-function saveCurrentDayInputs() {
-
-  const data =
-    getDayData(currentDay);
-
-
-  const water =
-    document.getElementById(
-      "waterInput"
-    );
-
-  const steps =
-    document.getElementById(
-      "stepsInput"
-    );
-
-  const weight =
-    document.getElementById(
-      "weightInput"
-    );
-
-  const workoutInput =
-    document.getElementById(
-      "workoutInput"
-    );
-
-  const workoutSelect =
-    document.getElementById(
-      "workoutSelect"
-    );
-
-  const fasting =
-    document.getElementById(
-      "fastingInput"
-    );
-
-  const notes =
-    document.getElementById(
-      "notesInput"
-    );
-
-
-  if (water) {
-    data.water = water.value;
-  }
-
-  if (steps) {
-    data.steps = steps.value;
-  }
-
-  if (weight) {
-    data.weight = weight.value;
-  }
-
-  if (workoutInput) {
-    data.workoutMinutes =
-      workoutInput.value;
-  }
-
-  if (workoutSelect) {
-    data.workout =
-      workoutSelect.value;
-  }
-
-  if (fasting) {
-    data.fasting =
-      fasting.value;
-  }
-
-  if (notes) {
-    data.notes =
-      notes.value;
-  }
-
-
-  data.completed =
-    isDayCompleted(data);
-
-
-  saveData();
+  renderDay();
 
   renderCalendar();
 
@@ -1348,10 +634,139 @@ function saveCurrentDayInputs() {
 
 
 /* =========================================================
-   POPULATE INPUTS
-   ========================================================= */
+   DAY VIEW
+========================================================= */
 
-function populateInputs(data) {
+function renderDay() {
+
+  const data =
+    getDayData(currentDay);
+
+  const totals =
+    getFoodTotals(
+      data.foods
+    );
+
+  const target =
+    getTargetForDay(currentDay);
+
+
+  document.getElementById(
+    "headerDay"
+  ).textContent =
+    `Day ${currentDay} of 90`;
+
+
+  document.getElementById(
+    "dateDisplay"
+  ).textContent =
+    getDateForDay(currentDay)
+      .toLocaleDateString(
+        undefined,
+        {
+          weekday: "long",
+          month: "long",
+          day: "numeric",
+          year: "numeric"
+        }
+      );
+
+
+  document.getElementById(
+    "targetDisplay"
+  ).textContent =
+    target;
+
+
+  document.getElementById(
+    "calorieGoal"
+  ).textContent =
+    target;
+
+
+  document.getElementById(
+    "caloriesTotal"
+  ).textContent =
+    Math.round(
+      totals.calories
+    );
+
+
+  document.getElementById(
+    "proteinTotal"
+  ).textContent =
+    formatNumber(
+      totals.protein
+    );
+
+
+  document.getElementById(
+    "fiberTotal"
+  ).textContent =
+    formatNumber(
+      totals.fiber
+    );
+
+
+  document.getElementById(
+    "waterTotal"
+  ).textContent =
+    data.water || 0;
+
+
+  const remaining =
+    target -
+    totals.calories;
+
+
+  document.getElementById(
+    "calorieMessage"
+  ).textContent =
+    remaining >= 0
+      ? `${Math.round(remaining)} remaining`
+      : `${Math.abs(Math.round(remaining))} over`;
+
+
+  const percentage =
+    target > 0
+      ? Math.min(
+          100,
+          totals.calories /
+          target *
+          100
+        )
+      : 0;
+
+
+  document.getElementById(
+    "calorieProgress"
+  ).style.width =
+    `${percentage}%`;
+
+
+  document.getElementById(
+    "specialBadge"
+  ).classList.toggle(
+    "hidden",
+    !data.special
+  );
+
+
+  document.getElementById(
+    "specialButton"
+  ).classList.toggle(
+    "hidden",
+    data.special
+  );
+
+
+  document.getElementById(
+    "removeSpecialButton"
+  ).classList.toggle(
+    "hidden",
+    !data.special
+  );
+
 
   setInput(
     "waterInput",
@@ -1369,12 +784,12 @@ function populateInputs(data) {
   );
 
   setInput(
-    "workoutInput",
+    "workoutMinutesInput",
     data.workoutMinutes
   );
 
   setInput(
-    "workoutSelect",
+    "workoutInput",
     data.workout
   );
 
@@ -1388,6 +803,9 @@ function populateInputs(data) {
     data.notes
   );
 
+
+  renderFoodList();
+
 }
 
 
@@ -1397,47 +815,422 @@ function setInput(id, value) {
     document.getElementById(id);
 
   if (element) {
-
     element.value =
-      value || "";
-
+      value === undefined ||
+      value === null
+        ? ""
+        : value;
   }
 
 }
 
 
 /* =========================================================
-   COMPLETION
-   ========================================================= */
+   FOOD LIST
+========================================================= */
 
-function isDayCompleted(data) {
+function renderFoodList() {
 
-  return (
-    data.foods.length > 0 ||
-    data.water ||
-    data.steps ||
-    data.weight ||
-    data.workoutMinutes ||
-    data.workout ||
-    data.fasting ||
-    data.notes
+  const container =
+    document.getElementById(
+      "foodList"
+    );
+
+  const foods =
+    getDayData(currentDay)
+      .foods;
+
+
+  if (foods.length === 0) {
+
+    container.innerHTML =
+      `<div class="empty">
+        No food logged yet.
+      </div>`;
+
+    return;
+
+  }
+
+
+  container.innerHTML =
+    foods.map(
+      function (food, index) {
+
+        return `
+
+          <div class="food-row">
+
+            <div>
+              <strong>
+                ${escapeHTML(food.name)}
+              </strong>
+
+              <small>
+                ${escapeHTML(food.serving)}
+              </small>
+            </div>
+
+            <div>
+              <strong>
+                ${Math.round(food.calories)} cal
+              </strong>
+
+              <small>
+                ${formatNumber(food.protein)}g
+                protein ·
+                ${formatNumber(food.fiber)}g
+                fiber
+              </small>
+            </div>
+
+            <button
+              class="delete-food"
+              data-food-index="${index}"
+            >
+              ×
+            </button>
+
+          </div>
+
+        `;
+
+      }
+    ).join("");
+
+
+  container
+    .querySelectorAll(".delete-food")
+    .forEach(
+      function (button) {
+
+        button.addEventListener(
+          "click",
+          function () {
+
+            const index =
+              Number(
+                button.dataset.foodIndex
+              );
+
+            getDayData(currentDay)
+              .foods
+              .splice(index, 1);
+
+            saveData();
+
+            renderAll();
+
+          }
+        );
+
+      }
+    );
+
+}
+
+
+/* =========================================================
+   DAILY INPUTS
+========================================================= */
+
+function setupTrackingInputs() {
+
+  const ids = [
+
+    "waterInput",
+    "stepsInput",
+    "weightInput",
+    "workoutMinutesInput",
+    "workoutInput",
+    "fastingInput",
+    "notesInput"
+
+  ];
+
+
+  ids.forEach(
+    function (id) {
+
+      const element =
+        document.getElementById(id);
+
+      element.addEventListener(
+        "input",
+        saveTracking
+      );
+
+      element.addEventListener(
+        "change",
+        saveTracking
+      );
+
+    }
+  );
+
+}
+
+
+function saveTracking() {
+
+  const data =
+    getDayData(currentDay);
+
+
+  data.water =
+    document.getElementById(
+      "waterInput"
+    ).value;
+
+  data.steps =
+    document.getElementById(
+      "stepsInput"
+    ).value;
+
+  data.weight =
+    document.getElementById(
+      "weightInput"
+    ).value;
+
+  data.workoutMinutes =
+    document.getElementById(
+      "workoutMinutesInput"
+    ).value;
+
+  data.workout =
+    document.getElementById(
+      "workoutInput"
+    ).value;
+
+  data.fasting =
+    document.getElementById(
+      "fastingInput"
+    ).value;
+
+  data.notes =
+    document.getElementById(
+      "notesInput"
+    ).value;
+
+
+  saveData();
+
+  renderCalendar();
+
+  renderDashboard();
+
+}
+
+
+/* =========================================================
+   DAY NAVIGATION
+========================================================= */
+
+function setupDayButtons() {
+
+  document.getElementById(
+    "previousDay"
+  ).addEventListener(
+    "click",
+    function () {
+
+      if (currentDay > 1) {
+
+        currentDay--;
+
+        renderAll();
+
+      }
+
+    }
+  );
+
+
+  document.getElementById(
+    "nextDay"
+  ).addEventListener(
+    "click",
+    function () {
+
+      if (currentDay < 90) {
+
+        currentDay++;
+
+        renderAll();
+
+      }
+
+    }
+  );
+
+
+  document.getElementById(
+    "todayButton"
+  ).addEventListener(
+    "click",
+    function () {
+
+      currentDay =
+        getInitialDay();
+
+      showPage("dayPage");
+
+      renderAll();
+
+      window.scrollTo(
+        {
+          top: 0,
+          behavior: "smooth"
+        }
+      );
+
+    }
+  );
+
+
+  document.getElementById(
+    "specialButton"
+  ).addEventListener(
+    "click",
+    function () {
+
+      getDayData(currentDay)
+        .special = true;
+
+      saveData();
+
+      renderAll();
+
+    }
+  );
+
+
+  document.getElementById(
+    "removeSpecialButton"
+  ).addEventListener(
+    "click",
+    function () {
+
+      getDayData(currentDay)
+        .special = false;
+
+      saveData();
+
+      renderAll();
+
+    }
   );
 
 }
 
 
 /* =========================================================
+   NAVIGATION
+========================================================= */
+
+function setupNavigation() {
+
+  document
+    .querySelectorAll(".nav-button")
+    .forEach(
+      function (button) {
+
+        button.addEventListener(
+          "click",
+          function () {
+
+            showPage(
+              button.dataset.page
+            );
+
+          }
+        );
+
+      }
+    );
+
+}
+
+
+function showPage(pageId) {
+
+  document
+    .querySelectorAll(".page")
+    .forEach(
+      function (page) {
+
+        page.classList.toggle(
+          "active",
+          page.id === pageId
+        );
+
+      }
+    );
+
+
+  document
+    .querySelectorAll(".nav-button")
+    .forEach(
+      function (button) {
+
+        button.classList.toggle(
+          "active",
+          button.dataset.page === pageId
+        );
+
+      }
+    );
+
+
+  if (pageId === "calendarPage") {
+    renderCalendar();
+  }
+
+  if (pageId === "dashboardPage") {
+    renderDashboard();
+  }
+
+}
+
+
+/* =========================================================
    CALENDAR
-   ========================================================= */
+========================================================= */
 
 function renderCalendar() {
 
-  const calendar =
+  const grid =
     document.getElementById(
       "calendarGrid"
     );
 
-  if (!calendar) return;
+
+  let completed = 0;
+
+
+  for (
+    let day = 1;
+    day <= 90;
+    day++
+  ) {
+
+    if (
+      isDayLogged(
+        getDayData(day)
+      )
+    ) {
+
+      completed++;
+
+    }
+
+  }
+
+
+  document.getElementById(
+    "calendarCompleted"
+  ).textContent =
+    `${completed} / 90`;
 
 
   let html = "";
@@ -1445,67 +1238,65 @@ function renderCalendar() {
 
   for (
     let day = 1;
-    day <= TOTAL_DAYS;
+    day <= 90;
     day++
   ) {
 
     const data =
       getDayData(day);
 
-    const target =
-      calorieTargets[day - 1];
-
     const totals =
-      calculateTotals(
+      getFoodTotals(
         data.foods
       );
 
-
-    let status = "";
-
-
-    if (
-      totals.calories >
-      target
-    ) {
-
-      status = "over";
-
-    } else if (
-      data.foods.length > 0
-    ) {
-
-      status = "logged";
-
-    }
-
-
-    if (
-      day === currentDay
-    ) {
-
-      status += " current";
-
-    }
-
+    const target =
+      getTargetForDay(day);
 
     const date =
       getDateForDay(day);
 
 
+    let className =
+      "calendar-day";
+
+
+    if (
+      day === currentDay
+    ) {
+      className +=
+        " current";
+    }
+
+
+    if (
+      isDayLogged(data)
+    ) {
+      className +=
+        " logged";
+    }
+
+
+    if (
+      totals.calories > target
+    ) {
+      className +=
+        " over";
+    }
+
+
     html += `
 
       <button
-        class="calendar-day ${status}"
-        data-day="${day}"
-        type="button"
+        class="${className}"
+        data-calendar-day="${day}"
       >
 
         <span class="calendar-day-number">
           Day ${day}
         </span>
 
-        <strong>
+        <span class="calendar-date">
           ${date.toLocaleDateString(
             undefined,
             {
@@ -1513,14 +1304,13 @@ function renderCalendar() {
               day: "numeric"
             }
           )}
-        </strong>
-
-        <span>
-          Target:
-          ${target} cal
         </span>
 
-        <span>
+        <span class="calendar-target">
+          Target: ${target} cal
+        </span>
+
+        <span class="calendar-logged">
           Logged:
           ${Math.round(
             totals.calories
@@ -1530,9 +1320,18 @@ function renderCalendar() {
         ${
           data.weight
             ? `
-              <span>
-                Weight:
+              <span class="calendar-logged">
                 ${data.weight} lb
+              </span>
+            `
+            : ""
+        }
+
+        ${
+          data.special
+            ? `
+              <span class="calendar-special">
+                Special
               </span>
             `
             : ""
@@ -1545,94 +1344,523 @@ function renderCalendar() {
   }
 
 
-  calendar.innerHTML =
+  grid.innerHTML =
     html;
 
 
-  calendar
+  grid
     .querySelectorAll(
       ".calendar-day"
     )
-    .forEach(button => {
+    .forEach(
+      function (button) {
 
-      button.addEventListener(
-        "click",
-        () => {
+        button.addEventListener(
+          "click",
+          function () {
 
-          currentDay =
-            Number(
-              button.dataset.day
+            currentDay =
+              Number(
+                button.dataset
+                  .calendarDay
+              );
+
+            showPage(
+              "dayPage"
             );
 
-          renderEverything();
+            renderAll();
 
-          window.scrollTo({
-            top: 0,
-            behavior: "smooth"
-          });
+            window.scrollTo(
+              {
+                top: 0,
+                behavior: "smooth"
+              }
+            );
 
-        }
-      );
+          }
+        );
 
-    });
-
-
-  updateCompletedLabel();
+      }
+    );
 
 }
 
 
 /* =========================================================
-   COMPLETED LABEL
-   ========================================================= */
+   FOOD MODAL
+========================================================= */
 
-function updateCompletedLabel() {
+function setupFoodButtons() {
 
-  const element =
+  document.getElementById(
+    "addFoodButton"
+  ).addEventListener(
+    "click",
+    openFoodModal
+  );
+
+
+  document.getElementById(
+    "closeFoodButton"
+  ).addEventListener(
+    "click",
+    closeFoodModal
+  );
+
+
+  document.getElementById(
+    "foodSearch"
+  ).addEventListener(
+    "input",
+    renderFoodResults
+  );
+
+
+  document.getElementById(
+    "createCustomFoodButton"
+  ).addEventListener(
+    "click",
+    function () {
+
+      closeFoodModal();
+
+      openCustomFoodModal();
+
+    }
+  );
+
+
+  document.getElementById(
+    "closeCustomButton"
+  ).addEventListener(
+    "click",
+    closeCustomFoodModal
+  );
+
+
+  document.getElementById(
+    "saveCustomButton"
+  ).addEventListener(
+    "click",
+    saveCustomFood
+  );
+
+
+  document.getElementById(
+    "foodModal"
+  ).addEventListener(
+    "click",
+    function (event) {
+
+      if (
+        event.target.id ===
+        "foodModal"
+      ) {
+
+        closeFoodModal();
+
+      }
+
+    }
+  );
+
+
+  document.getElementById(
+    "customFoodModal"
+  ).addEventListener(
+    "click",
+    function (event) {
+
+      if (
+        event.target.id ===
+        "customFoodModal"
+      ) {
+
+        closeCustomFoodModal();
+
+      }
+
+    }
+  );
+
+}
+
+
+function openFoodModal() {
+
+  document.getElementById(
+    "foodModal"
+  ).classList.remove(
+    "hidden"
+  );
+
+
+  document.getElementById(
+    "foodSearch"
+  ).value = "";
+
+
+  renderFoodResults();
+
+
+  setTimeout(
+    function () {
+
+      document.getElementById(
+        "foodSearch"
+      ).focus();
+
+    },
+    50
+  );
+
+}
+
+
+function closeFoodModal() {
+
+  document.getElementById(
+    "foodModal"
+  ).classList.add(
+    "hidden"
+  );
+
+}
+
+
+function getAllFoods() {
+
+  return [
+    ...FOOD_DATABASE,
+    ...appData.customFoods
+  ];
+
+}
+
+
+function renderFoodResults() {
+
+  const query =
     document.getElementById(
-      "completedLabel"
+      "foodSearch"
+    ).value
+      .trim()
+      .toLowerCase();
+
+
+  const foods =
+    getAllFoods().filter(
+      function (food) {
+
+        return food.name
+          .toLowerCase()
+          .includes(query);
+
+      }
     );
 
-  if (!element) return;
+
+  const container =
+    document.getElementById(
+      "foodResults"
+    );
 
 
-  let completed = 0;
+  if (foods.length === 0) {
+
+    container.innerHTML =
+      `<div class="empty">
+        No matching food found.
+      </div>`;
+
+    return;
+
+  }
 
 
-  for (
-    let day = 1;
-    day <= TOTAL_DAYS;
-    day++
+  container.innerHTML =
+    foods.map(
+      function (food, index) {
+
+        return `
+
+          <button
+            class="food-result"
+            data-food-result="${index}"
+          >
+
+            <strong>
+              ${escapeHTML(food.name)}
+            </strong>
+
+            <small>
+              ${escapeHTML(food.serving)}
+              ·
+              ${food.calories} cal
+              ·
+              ${formatNumber(food.protein)}g
+              protein
+              ·
+              ${formatNumber(food.fiber)}g
+              fiber
+            </small>
+
+          </button>
+
+        `;
+
+      }
+    ).join("");
+
+
+  container
+    .querySelectorAll(
+      ".food-result"
+    )
+    .forEach(
+      function (button) {
+
+        button.addEventListener(
+          "click",
+          function () {
+
+            const index =
+              Number(
+                button.dataset
+                  .foodResult
+              );
+
+            addFood(
+              foods[index]
+            );
+
+          }
+        );
+
+      }
+    );
+
+}
+
+
+function addFood(food) {
+
+  const copy = {
+    name: food.name,
+    serving: food.serving,
+    calories: Number(food.calories) || 0,
+    protein: Number(food.protein) || 0,
+    fiber: Number(food.fiber) || 0
+  };
+
+
+  getDayData(currentDay)
+    .foods
+    .push(copy);
+
+
+  saveData();
+
+  closeFoodModal();
+
+  renderAll();
+
+}
+
+
+/* =========================================================
+   CUSTOM FOOD
+========================================================= */
+
+function openCustomFoodModal() {
+
+  document.getElementById(
+    "customFoodModal"
+  ).classList.remove(
+    "hidden"
+  );
+
+
+  document.getElementById(
+    "customError"
+  ).textContent = "";
+
+}
+
+
+function closeCustomFoodModal() {
+
+  document.getElementById(
+    "customFoodModal"
+  ).classList.add(
+    "hidden"
+  );
+
+}
+
+
+function saveCustomFood() {
+
+  const name =
+    document.getElementById(
+      "customName"
+    ).value.trim();
+
+
+  const serving =
+    document.getElementById(
+      "customServing"
+    ).value.trim() ||
+    "1 serving";
+
+
+  const calories =
+    Number(
+      document.getElementById(
+        "customCalories"
+      ).value
+    );
+
+
+  const protein =
+    Number(
+      document.getElementById(
+        "customProtein"
+      ).value
+    ) || 0;
+
+
+  const fiber =
+    Number(
+      document.getElementById(
+        "customFiber"
+      ).value
+    ) || 0;
+
+
+  const error =
+    document.getElementById(
+      "customError"
+    );
+
+
+  if (!name) {
+
+    error.textContent =
+      "Enter a food name.";
+
+    return;
+
+  }
+
+
+  if (
+    !Number.isFinite(calories) ||
+    calories < 0
   ) {
 
-    if (
-      isDayCompleted(
-        getDayData(day)
-      )
-    ) {
+    error.textContent =
+      "Enter a valid calorie amount.";
 
-      completed++;
+    return;
+
+  }
+
+
+  const food = {
+
+    name,
+    serving,
+    calories,
+    protein,
+    fiber
+
+  };
+
+
+  const saveToFoods =
+    document.getElementById(
+      "saveCustomFood"
+    ).checked;
+
+
+  if (saveToFoods) {
+
+    const existingIndex =
+      appData.customFoods.findIndex(
+        function (item) {
+
+          return item.name
+            .toLowerCase() ===
+            name.toLowerCase();
+
+        }
+      );
+
+
+    if (existingIndex >= 0) {
+
+      appData.customFoods[
+        existingIndex
+      ] = food;
+
+    } else {
+
+      appData.customFoods.push(
+        food
+      );
 
     }
 
   }
 
 
-  element.textContent =
-    `${completed} / ${TOTAL_DAYS} days`;
+  addFood(food);
+
+  closeCustomFoodModal();
+
+  clearCustomFoodForm();
+
+}
+
+
+function clearCustomFoodForm() {
+
+  document.getElementById(
+    "customName"
+  ).value = "";
+
+  document.getElementById(
+    "customServing"
+  ).value = "";
+
+  document.getElementById(
+    "customCalories"
+  ).value = "";
+
+  document.getElementById(
+    "customProtein"
+  ).value = "";
+
+  document.getElementById(
+    "customFiber"
+  ).value = "";
 
 }
 
 
 /* =========================================================
    DASHBOARD
-   ========================================================= */
+========================================================= */
 
 function renderDashboard() {
 
   const weights = [];
 
-  const dates = [];
+  let loggedDays = 0;
+
+  let workoutDays = 0;
 
   let totalCalories = 0;
 
@@ -1640,12 +1868,10 @@ function renderDashboard() {
 
   let totalFiber = 0;
 
-  let workoutDays = 0;
-
 
   for (
     let day = 1;
-    day <= TOTAL_DAYS;
+    day <= 90;
     day++
   ) {
 
@@ -1653,24 +1879,32 @@ function renderDashboard() {
       getDayData(day);
 
     const totals =
-      calculateTotals(
+      getFoodTotals(
         data.foods
       );
 
 
-    totalCalories +=
-      totals.calories;
+    if (
+      isDayLogged(data)
+    ) {
 
-    totalProtein +=
-      totals.protein;
+      loggedDays++;
 
-    totalFiber +=
-      totals.fiber;
+      totalCalories +=
+        totals.calories;
+
+      totalProtein +=
+        totals.protein;
+
+      totalFiber +=
+        totals.fiber;
+
+    }
 
 
     if (
-      data.workoutMinutes ||
-      data.workout
+      data.workout ||
+      Number(data.workoutMinutes) > 0
     ) {
 
       workoutDays++;
@@ -1680,113 +1914,156 @@ function renderDashboard() {
 
     if (
       data.weight !== "" &&
-      data.weight !== null &&
-      data.weight !== undefined
+      Number.isFinite(
+        Number(data.weight)
+      )
     ) {
 
-      weights.push(
-        Number(data.weight)
-      );
-
-      dates.push(
-        getDateForDay(day)
-      );
+      weights.push({
+        day: day,
+        weight: Number(
+          data.weight
+        )
+      });
 
     }
 
   }
 
 
-  const averageCalories =
-    weights.length
-      ? totalCalories / Math.max(1, getLoggedDays())
-      : 0;
+  document.getElementById(
+    "daysLogged"
+  ).textContent =
+    loggedDays;
 
 
-  setText(
-    "averageCalories",
-    Math.round(
-      averageCalories
-    )
-  );
+  document.getElementById(
+    "workoutDays"
+  ).textContent =
+    workoutDays;
 
 
-  setText(
-    "workoutDays",
-    workoutDays
-  );
+  document.getElementById(
+    "averageCalories"
+  ).textContent =
+    loggedDays
+      ? Math.round(
+          totalCalories /
+          loggedDays
+        )
+      : "—";
+
+
+  document.getElementById(
+    "averageProtein"
+  ).textContent =
+    loggedDays
+      ? `${formatNumber(
+          totalProtein /
+          loggedDays
+        )} g`
+      : "—";
+
+
+  document.getElementById(
+    "averageFiber"
+  ).textContent =
+    loggedDays
+      ? `${formatNumber(
+          totalFiber /
+          loggedDays
+        )} g`
+      : "—";
 
 
   if (weights.length) {
 
-    const first =
-      weights[0];
+    const starting =
+      weights[0].weight;
 
     const latest =
-      weights[weights.length - 1];
+      weights[
+        weights.length - 1
+      ].weight;
+
 
     const change =
-      latest - first;
+      latest -
+      starting;
 
 
-    setText(
-      "weightChange",
-      `${change > 0 ? "+" : ""}${roundNumber(change)} lb`
-    );
+    document.getElementById(
+      "startingWeight"
+    ).textContent =
+      `${formatNumber(starting)} lb`;
+
+
+    document.getElementById(
+      "latestWeight"
+    ).textContent =
+      `${formatNumber(latest)} lb`;
+
+
+    document.getElementById(
+      "totalWeightChange"
+    ).textContent =
+      `${change > 0 ? "+" : ""}${formatNumber(change)} lb`;
+
+
+    document.getElementById(
+      "weightChartLabel"
+    ).textContent =
+      `${weights.length} weigh-in${weights.length === 1 ? "" : "s"}`;
 
   } else {
 
-    setText(
-      "weightChange",
-      "—"
-    );
+    document.getElementById(
+      "startingWeight"
+    ).textContent =
+      "—";
+
+    document.getElementById(
+      "latestWeight"
+    ).textContent =
+      "—";
+
+    document.getElementById(
+      "totalWeightChange"
+    ).textContent =
+      "—";
 
   }
 
 
   renderWeightChart(
-    weights,
-    dates
+    weights
   );
 
-
-  renderWeeklySummary();
+  renderWeeklyTable();
 
 }
 
 
 /* =========================================================
    WEIGHT CHART
-   ========================================================= */
+========================================================= */
 
-function renderWeightChart(
-  weights,
-  dates
-) {
+function renderWeightChart(weights) {
 
   const container =
     document.getElementById(
       "weightChart"
     );
 
-  if (!container) return;
 
-
-  if (!weights.length) {
+  if (weights.length === 0) {
 
     container.innerHTML = `
 
-      <div class="single-weight">
-
-        <strong>
-          No weight data yet
-        </strong>
-
-        <span>
-          Enter your weight on the
-          daily tracker to build your graph.
-        </span>
-
+      <div class="empty">
+        Enter your weight on the
+        daily tracker to create your
+        90-day weight graph.
       </div>
 
     `;
@@ -1800,20 +2077,22 @@ function renderWeightChart(
 
     container.innerHTML = `
 
-      <div class="single-weight">
+      <div class="empty">
 
         <strong>
-          ${roundNumber(weights[0])} lb
+          ${formatNumber(
+            weights[0].weight
+          )} lb
         </strong>
 
-        <span>
-          ${formatDate(dates[0])}
-        </span>
+        <br>
 
-        <p>
-          Add another weight entry to
-          see the change over time.
-        </p>
+        Day ${weights[0].day}
+
+        <br><br>
+
+        Add another weigh-in to
+        create the graph.
 
       </div>
 
@@ -1826,28 +2105,48 @@ function renderWeightChart(
 
   const width = 900;
 
-  const height = 310;
+  const height = 300;
 
   const padding = 45;
 
 
-  const minWeight =
-    Math.min(...weights) - 3;
+  const values =
+    weights.map(
+      function (item) {
+        return item.weight;
+      }
+    );
 
-  const maxWeight =
-    Math.max(...weights) + 3;
+
+  let min =
+    Math.min(...values);
+
+  let max =
+    Math.max(...values);
+
+
+  if (min === max) {
+
+    min -= 2;
+
+    max += 2;
+
+  } else {
+
+    min -= 2;
+
+    max += 2;
+
+  }
 
 
   const range =
-    Math.max(
-      1,
-      maxWeight - minWeight
-    );
+    max - min;
 
 
   const points =
     weights.map(
-      (weight, index) => {
+      function (item, index) {
 
         const x =
           padding +
@@ -1866,8 +2165,8 @@ function renderWeightChart(
           padding -
           (
             (
-              weight -
-              minWeight
+              item.weight -
+              min
             ) /
             range
           ) *
@@ -1878,57 +2177,54 @@ function renderWeightChart(
 
 
         return {
-          x,
-          y,
-          weight
+          x: x,
+          y: y,
+          weight: item.weight,
+          day: item.day
         };
 
       }
     );
 
 
-  const line =
-    points
-      .map(
-        point =>
-          `${point.x},${point.y}`
-      )
-      .join(" ");
+  const polyline =
+    points.map(
+      function (point) {
+
+        return `${point.x},${point.y}`;
+
+      }
+    ).join(" ");
 
 
   const circles =
-    points
-      .map(
-        point => `
+    points.map(
+      function (point) {
+
+        return `
 
           <circle
+            class="chart-point"
             cx="${point.x}"
             cy="${point.y}"
             r="5"
           />
 
-        `
-      )
-      .join("");
+        `;
 
-
-  const firstWeight =
-    weights[0];
-
-  const lastWeight =
-    weights[weights.length - 1];
+      }
+    ).join("");
 
 
   container.innerHTML = `
 
     <svg
-      class="chart-svg"
-      viewBox="0 0 ${width} ${height}"
+      viewBox="0 0 900 300"
       preserveAspectRatio="none"
-      aria-label="Weight change graph"
     >
 
       <line
+        class="chart-grid-line"
         x1="${padding}"
         y1="${padding}"
         x2="${width - padding}"
@@ -1936,6 +2232,7 @@ function renderWeightChart(
       />
 
       <line
+        class="chart-grid-line"
         x1="${padding}"
         y1="${height / 2}"
         x2="${width - padding}"
@@ -1943,56 +2240,34 @@ function renderWeightChart(
       />
 
       <line
+        class="chart-grid-line"
         x1="${padding}"
         y1="${height - padding}"
         x2="${width - padding}"
         y2="${height - padding}"
       />
 
-      <text
-        x="5"
-        y="${padding + 4}"
-      >
-        ${Math.round(maxWeight)}
-      </text>
-
-      <text
-        x="5"
-        y="${height / 2 + 4}"
-      >
-        ${Math.round(
-          (maxWeight + minWeight) / 2
-        )}
-      </text>
-
-      <text
-        x="5"
-        y="${height - padding + 4}"
-      >
-        ${Math.round(minWeight)}
-      </text>
-
       <polyline
-        class="weight-line"
-        points="${line}"
+        class="chart-line"
+        points="${polyline}"
       />
 
       ${circles}
 
       <text
-        x="${padding}"
-        y="${height - 10}"
+        class="chart-text"
+        x="5"
+        y="${padding + 5}"
       >
-        Start:
-        ${roundNumber(firstWeight)}
+        ${formatNumber(max)} lb
       </text>
 
       <text
-        x="${width - 145}"
-        y="${height - 10}"
+        class="chart-text"
+        x="5"
+        y="${height - padding + 5}"
       >
-        Latest:
-        ${roundNumber(lastWeight)}
+        ${formatNumber(min)} lb
       </text>
 
     </svg>
@@ -2003,40 +2278,18 @@ function renderWeightChart(
 
 
 /* =========================================================
-   WEEKLY SUMMARY
-   ========================================================= */
+   WEEKLY TABLE
+========================================================= */
 
-function renderWeeklySummary() {
+function renderWeeklyTable() {
 
-  const container =
+  const table =
     document.getElementById(
-      "weeklySummary"
+      "weeklyTable"
     );
 
-  if (!container) return;
 
-
-  let html = `
-
-    <div class="weekly-table-container">
-
-      <table class="weekly-table">
-
-        <thead>
-
-          <tr>
-            <th>Week</th>
-            <th>Start weight</th>
-            <th>End weight</th>
-            <th>Change</th>
-            <th>Workout days</th>
-          </tr>
-
-        </thead>
-
-        <tbody>
-
-  `;
+  let html = "";
 
 
   for (
@@ -2046,17 +2299,20 @@ function renderWeeklySummary() {
   ) {
 
     const startDay =
-      (week - 1) * 7 + 1;
+      (
+        week - 1
+      ) * 7 + 1;
+
 
     const endDay =
       Math.min(
         week * 7,
-        TOTAL_DAYS
+        90
       );
 
 
     const startWeight =
-      findWeight(
+      findFirstWeight(
         startDay,
         endDay
       );
@@ -2069,7 +2325,7 @@ function renderWeeklySummary() {
       );
 
 
-    let workoutDays = 0;
+    let workouts = 0;
 
 
     for (
@@ -2081,12 +2337,13 @@ function renderWeeklySummary() {
       const data =
         getDayData(day);
 
+
       if (
         data.workout ||
-        data.workoutMinutes
+        Number(data.workoutMinutes) > 0
       ) {
 
-        workoutDays++;
+        workouts++;
 
       }
 
@@ -2102,10 +2359,12 @@ function renderWeeklySummary() {
     ) {
 
       const difference =
-        endWeight - startWeight;
+        endWeight -
+        startWeight;
+
 
       change =
-        `${difference > 0 ? "+" : ""}${roundNumber(difference)} lb`;
+        `${difference > 0 ? "+" : ""}${formatNumber(difference)} lb`;
 
     }
 
@@ -2120,17 +2379,17 @@ function renderWeeklySummary() {
 
         <td>
           ${
-            startWeight !== null
-              ? `${roundNumber(startWeight)} lb`
-              : "—"
+            startWeight === null
+              ? "—"
+              : `${formatNumber(startWeight)} lb`
           }
         </td>
 
         <td>
           ${
-            endWeight !== null
-              ? `${roundNumber(endWeight)} lb`
-              : "—"
+            endWeight === null
+              ? "—"
+              : `${formatNumber(endWeight)} lb`
           }
         </td>
 
@@ -2139,7 +2398,7 @@ function renderWeeklySummary() {
         </td>
 
         <td>
-          ${workoutDays}
+          ${workouts}
         </td>
 
       </tr>
@@ -2149,28 +2408,13 @@ function renderWeeklySummary() {
   }
 
 
-  html += `
-
-        </tbody>
-
-      </table>
-
-    </div>
-
-  `;
-
-
-  container.innerHTML =
+  table.innerHTML =
     html;
 
 }
 
 
-/* =========================================================
-   WEIGHT HELPERS
-   ========================================================= */
-
-function findWeight(
+function findFirstWeight(
   startDay,
   endDay
 ) {
@@ -2184,10 +2428,9 @@ function findWeight(
     const weight =
       getDayData(day).weight;
 
+
     if (
-      weight !== "" &&
-      weight !== null &&
-      weight !== undefined
+      weight !== ""
     ) {
 
       return Number(weight);
@@ -2195,6 +2438,7 @@ function findWeight(
     }
 
   }
+
 
   return null;
 
@@ -2215,10 +2459,9 @@ function findLastWeight(
     const weight =
       getDayData(day).weight;
 
+
     if (
-      weight !== "" &&
-      weight !== null &&
-      weight !== undefined
+      weight !== ""
     ) {
 
       return Number(weight);
@@ -2227,183 +2470,78 @@ function findLastWeight(
 
   }
 
+
   return null;
 
 }
 
 
 /* =========================================================
-   UTILITY
-   ========================================================= */
+   HELPERS
+========================================================= */
 
-function getLoggedDays() {
+function isDayLogged(data) {
 
-  let count = 0;
+  return (
 
-  for (
-    let day = 1;
-    day <= TOTAL_DAYS;
-    day++
-  ) {
+    data.foods.length > 0 ||
 
-    const data =
-      getDayData(day);
+    data.water !== "" ||
 
-    if (
-      data.foods.length ||
-      data.weight ||
-      data.water ||
-      data.steps ||
-      data.workout
-    ) {
+    data.steps !== "" ||
 
-      count++;
+    data.weight !== "" ||
 
-    }
+    data.workoutMinutes !== "" ||
 
-  }
+    data.workout !== "" ||
 
-  return count;
+    data.fasting !== "" ||
 
-}
+    data.notes !== ""
 
-
-function roundNumber(number) {
-
-  const value =
-    Number(number);
-
-  if (
-    Number.isInteger(value)
-  ) {
-
-    return value;
-
-  }
-
-  return Number(
-    value.toFixed(1)
   );
 
 }
 
 
-function setText(
-  id,
-  value
-) {
+function formatNumber(number) {
 
-  const element =
-    document.getElementById(id);
+  const rounded =
+    Math.round(
+      Number(number) * 10
+    ) / 10;
 
-  if (element) {
 
-    element.textContent =
-      value;
-
-  }
+  return String(
+    rounded
+  );
 
 }
 
 
-function escapeHtml(value) {
+function escapeHTML(value) {
 
   return String(value)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
+    .replace(
+      /[&<>"']/g,
+      function (character) {
 
-}
+        const entities = {
 
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#039;"
 
-/* =========================================================
-   CLOSE MODAL WHEN CLICKING OUTSIDE
-   ========================================================= */
+        };
 
-document.addEventListener(
-  "click",
-  event => {
+        return entities[
+          character
+        ];
 
-    const modal =
-      document.getElementById(
-        "foodModal"
-      );
-
-    if (!modal) return;
-
-
-    if (
-      event.target === modal
-    ) {
-
-      closeFoodModal();
-
-    }
-
-  }
-);
-
-
-/* =========================================================
-   ESCAPE KEY
-   ========================================================= */
-
-document.addEventListener(
-  "keydown",
-  event => {
-
-    if (
-      event.key !== "Escape"
-    ) {
-      return;
-    }
-
-    closeFoodModal();
-
-  }
-);
-
-
-/* =========================================================
-   EXPOSE DATA FOR DEBUGGING
-   ========================================================= */
-
-window.SZN2WeightLoss = {
-
-  getData: () =>
-    JSON.parse(
-      JSON.stringify(
-        trackerData
-      )
-    ),
-
-  getCurrentDay: () =>
-    currentDay,
-
-  getTargets: () =>
-    [...calorieTargets],
-
-  clearAllData: () => {
-
-    const confirmed =
-      confirm(
-        "Delete ALL 90-day tracker data? This cannot be undone."
-      );
-
-    if (!confirmed) return;
-
-    localStorage.removeItem(
-      STORAGE_KEY
+      }
     );
 
-    trackerData = {};
-
-    currentDay = 1;
-
-    renderEverything();
-
-  }
-
-};
+}
